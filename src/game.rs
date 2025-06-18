@@ -123,8 +123,12 @@ impl Game {
             if !counts.is_empty() {
                 let mut num_x = (puzzle_left - 16) as i16;
                 let num_y = (puzzle_top + row * 8) as i16;
-                for num in counts.into_iter().rev() {
-                    let image = NUMBERS[num as usize - 1];
+                for (num, solved) in counts.into_iter().rev() {
+                    let image = if solved {
+                        NUMBERS_DIM[num as usize - 1]
+                    } else {
+                        NUMBERS[num as usize - 1]
+                    };
                     obj_index = image.render_to_objects(obj_index, (num_x, num_y), STEREO);
                     num_x -= 8;
                 }
@@ -139,8 +143,12 @@ impl Game {
             if !counts.is_empty() {
                 let num_x = (puzzle_left + col * 8) as i16;
                 let mut num_y = (puzzle_top - 16) as i16;
-                for num in counts.into_iter().rev() {
-                    let image = NUMBERS[num as usize - 1];
+                for (num, solved) in counts.into_iter().rev() {
+                    let image = if solved {
+                        NUMBERS_DIM[num as usize - 1]
+                    } else {
+                        NUMBERS[num as usize - 1]
+                    };
                     obj_index = image.render_to_objects(obj_index, (num_x, num_y), STEREO);
                     num_y -= 8;
                 }
@@ -174,25 +182,98 @@ impl Game {
         world.header().write(vip::WorldHeader::new().with_end(true));
     }
 
-    fn line_count(&self, indexes: impl Iterator<Item = usize>) -> ArrayVec<u8, 16> {
-        let mut result = ArrayVec::new();
-        let mut last_count = 0;
-        for index in indexes {
-            let cell = self.puzzle.cells[index];
-            if cell == 0 {
-                if last_count != 0 {
-                    result.push(last_count);
+    fn line_count(&self, indexes: impl Iterator<Item = usize>) -> ArrayVec<(u8, bool), 16> {
+        let mut cells = ArrayVec::<PuzzleCell, 16>::new();
+        let mut solution = ArrayVec::<u8, 16>::new();
+        let mut possibilities = ArrayVec::<u8, 16>::new();
+        {
+            let mut consecutive = 0;
+            for i in indexes {
+                cells.push(self.cells[i]);
+                if self.puzzle.cells[i] == 1 {
+                    consecutive += 1;
+                } else {
+                    if consecutive > 0 {
+                        solution.push(consecutive);
+                        possibilities.push(0);
+                    }
+                    consecutive = 0;
                 }
-                last_count = 0;
-            } else {
-                last_count += 1;
+            }
+            if consecutive > 0 {
+                solution.push(consecutive);
+                possibilities.push(0);
             }
         }
-        if last_count != 0 {
-            result.push(last_count);
+        if self.is_solved(&cells, &solution) {
+            return solution.into_iter().map(|n| (n, true)).collect();
+        }
+        let mut i = 0usize;
+        'outer: while i < cells.len() {
+            let cell = cells[i];
+            let is_start_of_group = matches!(cell, PuzzleCell::Full)
+                && (i == 0 || matches!(cells[i - 1], PuzzleCell::Empty { crossed: true }));
+            if is_start_of_group {
+                let start = i;
+                loop {
+                    i += 1;
+                    match cells.get(i) {
+                        None | Some(PuzzleCell::Empty { crossed: true }) => {
+                            break;
+                        }
+                        Some(PuzzleCell::Empty { crossed: false }) => {
+                            break 'outer;
+                        }
+                        Some(PuzzleCell::Full) => {
+                            continue;
+                        }
+                    }
+                }
+                let size = (i - start) as u8;
+                let mut something_is_valid = false;
+                for solution_index in solution
+                    .iter()
+                    .enumerate()
+                    .filter_map(|(i, n)| (*n == size).then_some(i))
+                {
+                    let is_valid = is_valid(&cells[..start], &solution[..solution_index])
+                        && is_valid(&cells[i + 1..], &solution[solution_index + 1..]);
+                    if is_valid {
+                        something_is_valid = true;
+                        possibilities[solution_index] += 1;
+                    }
+                }
+                if !something_is_valid {
+                    // couldn't find a solution for this closed group, so the player must have goofed
+                    return solution.into_iter().map(|n| (n, false)).collect();
+                }
+            } else {
+                i += 1;
+            }
         }
 
-        result
+        solution
+            .into_iter()
+            .zip(possibilities.into_iter().map(|n| n == 1))
+            .collect()
+    }
+
+    fn is_solved(&self, mut cells: &[PuzzleCell], solution: &[u8]) -> bool {
+        for count in solution {
+            while let Some((PuzzleCell::Empty { .. }, rest)) = cells.split_first() {
+                cells = rest;
+            }
+            for _ in 0..*count {
+                let Some((PuzzleCell::Full, rest)) = cells.split_first() else {
+                    return false;
+                };
+                cells = rest;
+            }
+            if let Some(PuzzleCell::Full) = cells.first() {
+                return false;
+            }
+        }
+        cells.iter().all(|c| matches!(c, PuzzleCell::Empty { .. }))
     }
 
     pub fn update(&mut self, state: &GameState) {
@@ -277,6 +358,46 @@ impl Game {
     }
 }
 
+fn is_valid(mut cells: &[PuzzleCell], solution: &[u8]) -> bool {
+    let Some((&count, solution)) = solution.split_first() else {
+        return cells.iter().all(|c| matches!(c, PuzzleCell::Empty { .. }));
+    };
+    'outer: loop {
+        while let Some((PuzzleCell::Empty { crossed: true }, rest)) = cells.split_first() {
+            cells = rest;
+        }
+        let old_cells = cells;
+        for _ in 0..count {
+            let Some((next, rest)) = cells.split_first() else {
+                return false;
+            };
+            cells = rest;
+            if matches!(next, PuzzleCell::Empty { crossed: true }) {
+                continue 'outer;
+            }
+        }
+        match cells.split_first() {
+            None => return solution.is_empty(),
+            Some((PuzzleCell::Full, _)) => {}
+            Some((PuzzleCell::Empty { crossed }, rest)) => {
+                if is_valid(rest, solution) {
+                    return true;
+                }
+                if *crossed {
+                    // optimization: if the region we're inspecting ends with a cross,
+                    // there's no room for the rest
+                    continue;
+                }
+            }
+        }
+        let (next, rest) = old_cells.split_first().unwrap();
+        if matches!(next, PuzzleCell::Full) {
+            return false;
+        }
+        cells = rest;
+    }
+}
+
 const NUMBERS: [&Image; 20] = [
     &assets::NUMBER_1,
     &assets::NUMBER_2,
@@ -300,7 +421,6 @@ const NUMBERS: [&Image; 20] = [
     &assets::NUMBER_20,
 ];
 
-#[expect(unused)]
 const NUMBERS_DIM: [&Image; 20] = [
     &assets::NUMBER_1_DIM,
     &assets::NUMBER_2_DIM,
