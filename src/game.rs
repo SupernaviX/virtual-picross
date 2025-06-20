@@ -10,7 +10,8 @@ use crate::{
 
 #[derive(Debug, Clone, Copy)]
 enum PuzzleCell {
-    Empty { crossed: bool },
+    Empty,
+    Cross,
     Full,
 }
 
@@ -32,7 +33,7 @@ impl Game {
     pub fn new() -> Self {
         Self {
             puzzle: &EMPTY,
-            cells: [PuzzleCell::Empty { crossed: false }; MAX_PUZZLE_SIZE * MAX_PUZZLE_SIZE],
+            cells: [PuzzleCell::Empty; MAX_PUZZLE_SIZE * MAX_PUZZLE_SIZE],
             row_numbers: ArrayVec::new(),
             col_numbers: ArrayVec::new(),
             cursor: (0, 0),
@@ -46,7 +47,7 @@ impl Game {
     pub fn load_puzzle(&mut self, puzzle: &'static Puzzle) {
         self.puzzle = puzzle;
         for cell in self.cells.iter_mut().take(puzzle.width * puzzle.height) {
-            *cell = PuzzleCell::Empty { crossed: false };
+            *cell = PuzzleCell::Empty;
         }
         self.row_numbers = (0..self.puzzle.height)
             .map(|row| self.row_count(row))
@@ -110,8 +111,8 @@ impl Game {
             for col in 0..self.puzzle.width {
                 let cell = self.cells[row * self.puzzle.width + col];
                 let image = match cell {
-                    PuzzleCell::Empty { crossed: false } => assets::SQUARE_EMPTY,
-                    PuzzleCell::Empty { crossed: true } => assets::SQUARE_CROSS,
+                    PuzzleCell::Empty => assets::SQUARE_EMPTY,
+                    PuzzleCell::Cross => assets::SQUARE_CROSS,
                     PuzzleCell::Full => assets::SQUARE_FULL,
                 };
                 let dst = (
@@ -242,16 +243,16 @@ impl Game {
         'outer: while i < cells.len() {
             let cell = cells[i];
             let is_start_of_group = matches!(cell, PuzzleCell::Full)
-                && (i == 0 || matches!(cells[i - 1], PuzzleCell::Empty { crossed: true }));
+                && (i == 0 || matches!(cells[i - 1], PuzzleCell::Cross));
             if is_start_of_group {
                 let start = i;
                 loop {
                     i += 1;
                     match cells.get(i) {
-                        None | Some(PuzzleCell::Empty { crossed: true }) => {
+                        None | Some(PuzzleCell::Cross) => {
                             break;
                         }
-                        Some(PuzzleCell::Empty { crossed: false }) => {
+                        Some(PuzzleCell::Empty) => {
                             break 'outer;
                         }
                         Some(PuzzleCell::Full) => {
@@ -290,7 +291,7 @@ impl Game {
 
     fn is_solved(&self, mut cells: &[PuzzleCell], solution: &[u8]) -> bool {
         for count in solution {
-            while let Some((PuzzleCell::Empty { .. }, rest)) = cells.split_first() {
+            while let Some((PuzzleCell::Empty | PuzzleCell::Cross, rest)) = cells.split_first() {
                 cells = rest;
             }
             for _ in 0..*count {
@@ -303,7 +304,9 @@ impl Game {
                 return false;
             }
         }
-        cells.iter().all(|c| matches!(c, PuzzleCell::Empty { .. }))
+        cells
+            .iter()
+            .all(|c| matches!(c, PuzzleCell::Empty | PuzzleCell::Cross))
     }
 
     pub fn update(&mut self, state: &GameState) {
@@ -346,14 +349,14 @@ impl Game {
         let index = self.cursor.1 * self.puzzle.width + self.cursor.0;
         if pressed.b() {
             let new_cell = match self.cells[index] {
-                PuzzleCell::Empty { crossed: true } => PuzzleCell::Empty { crossed: false },
-                _ => PuzzleCell::Empty { crossed: true },
+                PuzzleCell::Cross => PuzzleCell::Empty,
+                _ => PuzzleCell::Cross,
             };
             self.cursor_behavior = Some(new_cell);
         }
         if pressed.a() {
             let new_cell = match self.cells[index] {
-                PuzzleCell::Full => PuzzleCell::Empty { crossed: false },
+                PuzzleCell::Full => PuzzleCell::Empty,
                 _ => PuzzleCell::Full,
             };
             self.cursor_behavior = Some(new_cell);
@@ -382,7 +385,7 @@ impl Game {
             .all(|(solution, cell)| {
                 let expected = *solution;
                 let actual = match cell {
-                    PuzzleCell::Empty { .. } => 0,
+                    PuzzleCell::Empty | PuzzleCell::Cross => 0,
                     PuzzleCell::Full => 1,
                 };
                 expected == actual
@@ -392,10 +395,12 @@ impl Game {
 
 fn is_valid(mut cells: &[PuzzleCell], solution: &[u8]) -> bool {
     let Some((&count, solution)) = solution.split_first() else {
-        return cells.iter().all(|c| matches!(c, PuzzleCell::Empty { .. }));
+        return cells
+            .iter()
+            .all(|c| matches!(c, PuzzleCell::Empty | PuzzleCell::Cross));
     };
     'outer: loop {
-        while let Some((PuzzleCell::Empty { crossed: true }, rest)) = cells.split_first() {
+        while let Some((PuzzleCell::Cross, rest)) = cells.split_first() {
             cells = rest;
         }
         let old_cells = cells;
@@ -404,22 +409,25 @@ fn is_valid(mut cells: &[PuzzleCell], solution: &[u8]) -> bool {
                 return false;
             };
             cells = rest;
-            if matches!(next, PuzzleCell::Empty { crossed: true }) {
+            if matches!(next, PuzzleCell::Cross) {
                 continue 'outer;
             }
         }
         match cells.split_first() {
             None => return solution.is_empty(),
             Some((PuzzleCell::Full, _)) => {}
-            Some((PuzzleCell::Empty { crossed }, rest)) => {
+            Some((PuzzleCell::Empty, rest)) => {
                 if is_valid(rest, solution) {
                     return true;
                 }
-                if *crossed {
-                    // optimization: if the region we're inspecting ends with a cross,
-                    // there's no room for the rest
-                    continue;
+            }
+            Some((PuzzleCell::Cross, rest)) => {
+                if is_valid(rest, solution) {
+                    return true;
                 }
+                // optimization: if the region we're inspecting ends with a cross,
+                // there's no room for the rest
+                continue;
             }
         }
         let (next, rest) = old_cells.split_first().unwrap();
