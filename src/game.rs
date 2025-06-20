@@ -61,6 +61,26 @@ impl Game {
         self.solved = false;
     }
 
+    pub fn size_pixels(&self) -> (usize, usize) {
+        let width = (self.puzzle.width * 8)
+            + 8
+            + self
+                .col_numbers
+                .iter()
+                .map(|n| n.len() * 8)
+                .max()
+                .unwrap_or_default();
+        let height = (self.puzzle.height * 8)
+            + 8
+            + self
+                .row_numbers
+                .iter()
+                .map(|n| n.len() * 8)
+                .max()
+                .unwrap_or_default();
+        (width, height)
+    }
+
     pub fn draw(&self) {
         const STEREO: vip::ObjectStereo = vip::ObjectStereo::new().with_jlon(true).with_jron(true);
 
@@ -76,8 +96,15 @@ impl Game {
 
         let mut obj_index = 1023;
         vip::SPT3.write(obj_index);
-        let puzzle_left = 384 - 8 - (self.puzzle.width * 8);
-        let puzzle_top = 224 - 8 - (self.puzzle.height * 8);
+
+        let (width_pixels, height_pixels) = self.size_pixels();
+        let x_offset = (384 - width_pixels) / 2;
+        let y_offset = (224 - height_pixels) / 2;
+
+        let puzzle_right = 384 - 8 - x_offset;
+        let puzzle_bottom = 224 - 8 - y_offset;
+        let puzzle_left = puzzle_right - (self.puzzle.width * 8);
+        let puzzle_top = puzzle_bottom - (self.puzzle.height * 8);
 
         for row in 0..self.puzzle.height {
             for col in 0..self.puzzle.width {
@@ -93,15 +120,18 @@ impl Game {
                 );
                 obj_index = image.render_to_objects(obj_index, dst, STEREO);
             }
-            let dst = (384 - 8, (puzzle_top + row * 8) as i16);
+            let dst = (puzzle_right as i16, (puzzle_top + row * 8) as i16);
             obj_index = assets::SQUARE_RIGHT.render_to_objects(obj_index, dst, STEREO);
         }
         for col in 0..self.puzzle.width {
-            let dst = ((puzzle_left + col * 8) as i16, 224 - 8);
+            let dst = ((puzzle_left + col * 8) as i16, puzzle_bottom as i16);
             obj_index = assets::SQUARE_BOTTOM.render_to_objects(obj_index, dst, STEREO);
         }
-        obj_index =
-            assets::SQUARE_BOTTOM_RIGHT.render_to_objects(obj_index, (384 - 8, 224 - 8), STEREO);
+        obj_index = assets::SQUARE_BOTTOM_RIGHT.render_to_objects(
+            obj_index,
+            (puzzle_right as i16, puzzle_bottom as i16),
+            STEREO,
+        );
 
         if !self.solved {
             let cursor_x = (puzzle_left + self.cursor.0 * 8) as i16;
