@@ -109,11 +109,22 @@ impl Game {
 
         for row in 0..self.puzzle.height {
             for col in 0..self.puzzle.width {
+                let col_bright = col > 0 && col % 5 == 0;
+                let row_bright = row > 0 && row % 5 == 0;
                 let cell = self.cells[row * self.puzzle.width + col];
-                let image = match cell {
-                    PuzzleCell::Empty => assets::SQUARE_EMPTY,
-                    PuzzleCell::Cross => assets::SQUARE_CROSS,
-                    PuzzleCell::Full => assets::SQUARE_FULL,
+                let image = match (col_bright, row_bright, cell) {
+                    (false, false, PuzzleCell::Empty) => assets::SQUARE_DD_EMPTY,
+                    (false, false, PuzzleCell::Cross) => assets::SQUARE_DD_CROSS,
+                    (false, false, PuzzleCell::Full) => assets::SQUARE_DD_FULL,
+                    (false, true, PuzzleCell::Empty) => assets::SQUARE_DB_EMPTY,
+                    (false, true, PuzzleCell::Cross) => assets::SQUARE_DB_CROSS,
+                    (false, true, PuzzleCell::Full) => assets::SQUARE_DB_FULL,
+                    (true, false, PuzzleCell::Empty) => assets::SQUARE_BD_EMPTY,
+                    (true, false, PuzzleCell::Cross) => assets::SQUARE_BD_CROSS,
+                    (true, false, PuzzleCell::Full) => assets::SQUARE_BD_FULL,
+                    (true, true, PuzzleCell::Empty) => assets::SQUARE_BB_EMPTY,
+                    (true, true, PuzzleCell::Cross) => assets::SQUARE_BB_CROSS,
+                    (true, true, PuzzleCell::Full) => assets::SQUARE_BB_FULL,
                 };
                 let dst = (
                     (puzzle_left + col * 8) as i16,

@@ -2,47 +2,101 @@
 file = "assets/virtual-boy.ttf"
 size = 32
 
-[image.square-empty]
+[image.square-dd-empty]
 chardata = "all"
 file = "assets/squares.png"
 position = [0, 0]
 size = [8, 8]
 
-[image.square-full]
+[image.square-db-empty]
 chardata = "all"
 file = "assets/squares.png"
 position = [8, 0]
 size = [8, 8]
 
-[image.square-cross]
+[image.square-bd-empty]
 chardata = "all"
 file = "assets/squares.png"
 position = [16, 0]
 size = [8, 8]
 
-[image.square-hover]
+[image.square-bb-empty]
 chardata = "all"
 file = "assets/squares.png"
 position = [24, 0]
-size = [9, 9]
+size = [8, 8]
 
-[image.square-right]
+[image.square-dd-full]
 chardata = "all"
 file = "assets/squares.png"
 position = [0, 8]
 size = [8, 8]
 
-[image.square-bottom]
+[image.square-db-full]
 chardata = "all"
 file = "assets/squares.png"
 position = [8, 8]
 size = [8, 8]
 
-[image.square-bottom-right]
+[image.square-bd-full]
 chardata = "all"
 file = "assets/squares.png"
 position = [16, 8]
 size = [8, 8]
+
+[image.square-bb-full]
+chardata = "all"
+file = "assets/squares.png"
+position = [24, 8]
+size = [8, 8]
+
+[image.square-dd-cross]
+chardata = "all"
+file = "assets/squares.png"
+position = [0, 16]
+size = [8, 8]
+
+[image.square-db-cross]
+chardata = "all"
+file = "assets/squares.png"
+position = [8, 16]
+size = [8, 8]
+
+[image.square-bd-cross]
+chardata = "all"
+file = "assets/squares.png"
+position = [16, 16]
+size = [8, 8]
+
+[image.square-bb-cross]
+chardata = "all"
+file = "assets/squares.png"
+position = [24, 16]
+size = [8, 8]
+
+[image.square-right]
+chardata = "all"
+file = "assets/squares.png"
+position = [40, 0]
+size = [8, 8]
+
+[image.square-bottom]
+chardata = "all"
+file = "assets/squares.png"
+position = [32, 8]
+size = [8, 8]
+
+[image.square-bottom-right]
+chardata = "all"
+file = "assets/squares.png"
+position = [40, 8]
+size = [8, 8]
+
+[image.square-hover]
+chardata = "all"
+file = "assets/squares.png"
+position = [48, 0]
+size = [9, 9]
 
 [image.number-1]
 chardata = "all"
