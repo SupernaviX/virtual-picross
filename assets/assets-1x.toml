@@ -1,0 +1,335 @@
+[image.square-dd-empty]
+chardata = "all"
+file = "squares.png"
+position = [0, 0]
+size = [8, 8]
+
+[image.square-db-empty]
+chardata = "all"
+file = "squares.png"
+position = [8, 0]
+size = [8, 8]
+
+[image.square-bd-empty]
+chardata = "all"
+file = "squares.png"
+position = [16, 0]
+size = [8, 8]
+
+[image.square-bb-empty]
+chardata = "all"
+file = "squares.png"
+position = [24, 0]
+size = [8, 8]
+
+[image.square-dd-full]
+chardata = "all"
+file = "squares.png"
+position = [0, 8]
+size = [8, 8]
+
+[image.square-db-full]
+chardata = "all"
+file = "squares.png"
+position = [8, 8]
+size = [8, 8]
+
+[image.square-bd-full]
+chardata = "all"
+file = "squares.png"
+position = [16, 8]
+size = [8, 8]
+
+[image.square-bb-full]
+chardata = "all"
+file = "squares.png"
+position = [24, 8]
+size = [8, 8]
+
+[image.square-dd-cross]
+chardata = "all"
+file = "squares.png"
+position = [0, 16]
+size = [8, 8]
+
+[image.square-db-cross]
+chardata = "all"
+file = "squares.png"
+position = [8, 16]
+size = [8, 8]
+
+[image.square-bd-cross]
+chardata = "all"
+file = "squares.png"
+position = [16, 16]
+size = [8, 8]
+
+[image.square-bb-cross]
+chardata = "all"
+file = "squares.png"
+position = [24, 16]
+size = [8, 8]
+
+[image.square-right]
+chardata = "all"
+file = "squares.png"
+position = [40, 0]
+size = [8, 8]
+
+[image.square-bottom]
+chardata = "all"
+file = "squares.png"
+position = [32, 8]
+size = [8, 8]
+
+[image.square-bottom-right]
+chardata = "all"
+file = "squares.png"
+position = [40, 8]
+size = [8, 8]
+
+[image.square-hover]
+chardata = "all"
+file = "squares.png"
+position = [48, 0]
+size = [9, 9]
+
+[image.number-1]
+chardata = "all"
+file = "numbers.png"
+position = [8, 0]
+size = [8, 8]
+
+[image.number-2]
+chardata = "all"
+file = "numbers.png"
+position = [16, 0]
+size = [8, 8]
+
+[image.number-3]
+chardata = "all"
+file = "numbers.png"
+position = [24, 0]
+size = [8, 8]
+
+[image.number-4]
+chardata = "all"
+file = "numbers.png"
+position = [32, 0]
+size = [8, 8]
+
+[image.number-5]
+chardata = "all"
+file = "numbers.png"
+position = [40, 0]
+size = [8, 8]
+
+[image.number-6]
+chardata = "all"
+file = "numbers.png"
+position = [48, 0]
+size = [8, 8]
+
+[image.number-7]
+chardata = "all"
+file = "numbers.png"
+position = [56, 0]
+size = [8, 8]
+
+[image.number-8]
+chardata = "all"
+file = "numbers.png"
+position = [0, 8]
+size = [8, 8]
+
+[image.number-9]
+chardata = "all"
+file = "numbers.png"
+position = [8, 8]
+size = [8, 8]
+
+[image.number-10]
+chardata = "all"
+file = "numbers.png"
+position = [16, 8]
+size = [8, 8]
+
+[image.number-11]
+chardata = "all"
+file = "numbers.png"
+position = [24, 8]
+size = [8, 8]
+
+[image.number-12]
+chardata = "all"
+file = "numbers.png"
+position = [32, 8]
+size = [8, 8]
+
+[image.number-13]
+chardata = "all"
+file = "numbers.png"
+position = [40, 8]
+size = [8, 8]
+
+[image.number-14]
+chardata = "all"
+file = "numbers.png"
+position = [48, 8]
+size = [8, 8]
+
+[image.number-15]
+chardata = "all"
+file = "numbers.png"
+position = [56, 8]
+size = [8, 8]
+
+[image.number-16]
+chardata = "all"
+file = "numbers.png"
+position = [0, 16]
+size = [8, 8]
+
+[image.number-17]
+chardata = "all"
+file = "numbers.png"
+position = [8, 16]
+size = [8, 8]
+
+[image.number-18]
+chardata = "all"
+file = "numbers.png"
+position = [16, 16]
+size = [8, 8]
+
+[image.number-19]
+chardata = "all"
+file = "numbers.png"
+position = [24, 16]
+size = [8, 8]
+
+[image.number-20]
+chardata = "all"
+file = "numbers.png"
+position = [32, 16]
+size = [8, 8]
+
+[image.number-1-dim]
+chardata = "all"
+file = "numbers.png"
+position = [8, 32]
+size = [8, 8]
+
+[image.number-2-dim]
+chardata = "all"
+file = "numbers.png"
+position = [16, 32]
+size = [8, 8]
+
+[image.number-3-dim]
+chardata = "all"
+file = "numbers.png"
+position = [24, 32]
+size = [8, 8]
+
+[image.number-4-dim]
+chardata = "all"
+file = "numbers.png"
+position = [32, 32]
+size = [8, 8]
+
+[image.number-5-dim]
+chardata = "all"
+file = "numbers.png"
+position = [40, 32]
+size = [8, 8]
+
+[image.number-6-dim]
+chardata = "all"
+file = "numbers.png"
+position = [48, 32]
+size = [8, 8]
+
+[image.number-7-dim]
+chardata = "all"
+file = "numbers.png"
+position = [56, 32]
+size = [8, 8]
+
+[image.number-8-dim]
+chardata = "all"
+file = "numbers.png"
+position = [0, 40]
+size = [8, 8]
+
+[image.number-9-dim]
+chardata = "all"
+file = "numbers.png"
+position = [8, 40]
+size = [8, 8]
+
+[image.number-10-dim]
+chardata = "all"
+file = "numbers.png"
+position = [16, 40]
+size = [8, 8]
+
+[image.number-11-dim]
+chardata = "all"
+file = "numbers.png"
+position = [24, 40]
+size = [8, 8]
+
+[image.number-12-dim]
+chardata = "all"
+file = "numbers.png"
+position = [32, 40]
+size = [8, 8]
+
+[image.number-13-dim]
+chardata = "all"
+file = "numbers.png"
+position = [40, 40]
+size = [8, 8]
+
+[image.number-14-dim]
+chardata = "all"
+file = "numbers.png"
+position = [48, 40]
+size = [8, 8]
+
+[image.number-15-dim]
+chardata = "all"
+file = "numbers.png"
+position = [56, 40]
+size = [8, 8]
+
+[image.number-16-dim]
+chardata = "all"
+file = "numbers.png"
+position = [0, 48]
+size = [8, 8]
+
+[image.number-17-dim]
+chardata = "all"
+file = "numbers.png"
+position = [8, 48]
+size = [8, 8]
+
+[image.number-18-dim]
+chardata = "all"
+file = "numbers.png"
+position = [16, 48]
+size = [8, 8]
+
+[image.number-19-dim]
+chardata = "all"
+file = "numbers.png"
+position = [24, 48]
+size = [8, 8]
+
+[image.number-20-dim]
+chardata = "all"
+file = "numbers.png"
+position = [32, 48]
+size = [8, 8]

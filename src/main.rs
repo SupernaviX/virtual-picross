@@ -8,7 +8,11 @@ mod state;
 
 use vb_graphics as gfx;
 
-use crate::{game::Game, puzzle::PUZZLE, state::GameState};
+use crate::{
+    game::Game,
+    puzzle::{BOMBERMAN_BLOCK, GOLF_BALL},
+    state::GameState,
+};
 
 vb_rt::rom_header!("Virtual Picross", "SG", "VPIC");
 vb_rt::main!({ main() });
@@ -25,7 +29,8 @@ fn main() {
     gfx::load_character_data(&assets::ALL, 0);
 
     let mut game = Game::new();
-    game.load_puzzle(&PUZZLE);
+    game.load_puzzle(&GOLF_BALL);
+    game.load_puzzle(&BOMBERMAN_BLOCK);
     let mut state = GameState::new();
 
     FRAME.enable_interrupts();

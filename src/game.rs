@@ -62,21 +62,21 @@ impl Game {
         self.solved = false;
     }
 
-    pub fn size_pixels(&self) -> (usize, usize) {
-        let width = (self.puzzle.width * 8)
-            + 8
+    pub fn size_cells(&self) -> (usize, usize) {
+        let width = self.puzzle.width
+            + 1
             + self
                 .col_numbers
                 .iter()
-                .map(|n| n.len() * 8)
+                .map(|n| n.len())
                 .max()
                 .unwrap_or_default();
-        let height = (self.puzzle.height * 8)
-            + 8
+        let height = self.puzzle.height
+            + 1
             + self
                 .row_numbers
                 .iter()
-                .map(|n| n.len() * 8)
+                .map(|n| n.len())
                 .max()
                 .unwrap_or_default();
         (width, height)
@@ -98,85 +98,87 @@ impl Game {
         let mut obj_index = 1023;
         vip::SPT3.write(obj_index);
 
-        let (width_pixels, height_pixels) = self.size_pixels();
-        let x_offset = (384 - width_pixels) / 2;
-        let y_offset = (224 - height_pixels) / 2;
+        let (width_cells, height_cells) = self.size_cells();
+        let (cell_pixels, game_assets) = if width_cells >= 24 || height_cells >= 14 {
+            (8, GameAssets(&GAME_ASSETS_1X))
+        } else {
+            (16, GameAssets(&GAME_ASSETS_2X))
+        };
+        let x_offset = (384 - width_cells * cell_pixels) / 2;
+        let y_offset = (224 - height_cells * cell_pixels) / 2;
 
-        let puzzle_right = 384 - 8 - x_offset;
-        let puzzle_bottom = 224 - 8 - y_offset;
-        let puzzle_left = puzzle_right - (self.puzzle.width * 8);
-        let puzzle_top = puzzle_bottom - (self.puzzle.height * 8);
+        let puzzle_right = 384 - cell_pixels - x_offset;
+        let puzzle_bottom = 224 - cell_pixels - y_offset;
+        let puzzle_left = puzzle_right - (self.puzzle.width * cell_pixels);
+        let puzzle_top = puzzle_bottom - (self.puzzle.height * cell_pixels);
 
         for row in 0..self.puzzle.height {
             for col in 0..self.puzzle.width {
                 let col_bright = col > 0 && col % 5 == 0;
                 let row_bright = row > 0 && row % 5 == 0;
                 let cell = self.cells[row * self.puzzle.width + col];
-                let image = match (col_bright, row_bright, cell) {
-                    (false, false, PuzzleCell::Empty) => assets::SQUARE_DD_EMPTY,
-                    (false, false, PuzzleCell::Cross) => assets::SQUARE_DD_CROSS,
-                    (false, false, PuzzleCell::Full) => assets::SQUARE_DD_FULL,
-                    (false, true, PuzzleCell::Empty) => assets::SQUARE_DB_EMPTY,
-                    (false, true, PuzzleCell::Cross) => assets::SQUARE_DB_CROSS,
-                    (false, true, PuzzleCell::Full) => assets::SQUARE_DB_FULL,
-                    (true, false, PuzzleCell::Empty) => assets::SQUARE_BD_EMPTY,
-                    (true, false, PuzzleCell::Cross) => assets::SQUARE_BD_CROSS,
-                    (true, false, PuzzleCell::Full) => assets::SQUARE_BD_FULL,
-                    (true, true, PuzzleCell::Empty) => assets::SQUARE_BB_EMPTY,
-                    (true, true, PuzzleCell::Cross) => assets::SQUARE_BB_CROSS,
-                    (true, true, PuzzleCell::Full) => assets::SQUARE_BB_FULL,
-                };
+                let image = game_assets.square(col_bright, row_bright, cell);
                 let dst = (
-                    (puzzle_left + col * 8) as i16,
-                    (puzzle_top + row * 8) as i16,
+                    (puzzle_left + col * cell_pixels) as i16,
+                    (puzzle_top + row * cell_pixels) as i16,
                 );
                 obj_index = image.render_to_objects(obj_index, dst, STEREO);
             }
-            let dst = (puzzle_right as i16, (puzzle_top + row * 8) as i16);
-            obj_index = assets::SQUARE_RIGHT.render_to_objects(obj_index, dst, STEREO);
+            let dst = (puzzle_right as i16, (puzzle_top + row * cell_pixels) as i16);
+            obj_index = game_assets
+                .square_right()
+                .render_to_objects(obj_index, dst, STEREO);
         }
         for col in 0..self.puzzle.width {
-            let dst = ((puzzle_left + col * 8) as i16, puzzle_bottom as i16);
-            obj_index = assets::SQUARE_BOTTOM.render_to_objects(obj_index, dst, STEREO);
+            let dst = (
+                (puzzle_left + col * cell_pixels) as i16,
+                puzzle_bottom as i16,
+            );
+            obj_index = game_assets
+                .square_bottom()
+                .render_to_objects(obj_index, dst, STEREO);
         }
-        obj_index = assets::SQUARE_BOTTOM_RIGHT.render_to_objects(
+        obj_index = game_assets.square_bottom_right().render_to_objects(
             obj_index,
             (puzzle_right as i16, puzzle_bottom as i16),
             STEREO,
         );
 
         if !self.solved {
-            let cursor_x = (puzzle_left + self.cursor.0 * 8) as i16;
-            let cursor_y = (puzzle_top + self.cursor.1 * 8) as i16;
-            obj_index =
-                assets::SQUARE_HOVER.render_to_objects(obj_index, (cursor_x, cursor_y), STEREO);
+            let cursor_x = (puzzle_left + self.cursor.0 * cell_pixels) as i16;
+            let cursor_y = (puzzle_top + self.cursor.1 * cell_pixels) as i16;
+            obj_index = game_assets.square_hover().render_to_objects(
+                obj_index,
+                (cursor_x, cursor_y),
+                STEREO,
+            );
         }
 
         for (row, numbers) in self.row_numbers.iter().enumerate() {
-            let mut num_x = (puzzle_left - 16) as i16;
-            let num_y = (puzzle_top + row * 8) as i16;
+            let mut num_x = (puzzle_left - 2 * cell_pixels) as i16;
+            let num_y = (puzzle_top + row * cell_pixels) as i16;
             for &(num, solved) in numbers.iter().rev() {
                 let image = if solved {
-                    NUMBERS_DIM[num as usize - 1]
+                    game_assets.number_dim(num)
                 } else {
-                    NUMBERS[num as usize - 1]
+                    game_assets.number(num)
                 };
                 obj_index = image.render_to_objects(obj_index, (num_x, num_y), STEREO);
-                num_x -= 8;
+                num_x -= cell_pixels as i16;
             }
         }
 
         for (col, numbers) in self.col_numbers.iter().enumerate() {
-            let num_x = (puzzle_left + col * 8) as i16;
-            let mut num_y = (puzzle_top - 16) as i16;
+            let num_x = (puzzle_left + col * cell_pixels) as i16;
+            let mut num_y = (puzzle_top - 2 * cell_pixels) as i16;
             for &(num, solved) in numbers.iter().rev() {
                 let image = if solved {
-                    NUMBERS_DIM[num as usize - 1]
+                    game_assets.number_dim(num)
                 } else {
-                    NUMBERS[num as usize - 1]
+                    game_assets.number(num)
                 };
                 obj_index = image.render_to_objects(obj_index, (num_x, num_y), STEREO);
-                num_y -= 8;
+                num_y -= cell_pixels as i16;
             }
         }
 
@@ -380,7 +382,7 @@ impl Game {
             self.col_numbers[self.cursor.0] = self.col_count(self.cursor.0);
             self.row_numbers[self.cursor.1] = self.row_count(self.cursor.1);
             if self.has_been_solved() {
-                let mut renderer = TextRenderer::new(&assets::VIRTUAL_BOY, 128, (24, 14));
+                let mut renderer = TextRenderer::new(&assets::VIRTUAL_BOY, 256, (24, 14));
                 renderer.draw_text(self.puzzle.name);
                 renderer.render_to_bgmap(1, (0, 0));
                 self.solved = true;
@@ -449,7 +451,63 @@ fn is_valid(mut cells: &[PuzzleCell], solution: &[u8]) -> bool {
     }
 }
 
-const NUMBERS: [&Image; 20] = [
+struct GameAssets(&'static [&'static Image; 56]);
+impl GameAssets {
+    fn square(&self, col_bright: bool, row_bright: bool, cell: PuzzleCell) -> &'static Image {
+        let index = match (col_bright, row_bright, cell) {
+            (false, false, PuzzleCell::Empty) => 0,
+            (false, false, PuzzleCell::Cross) => 1,
+            (false, false, PuzzleCell::Full) => 2,
+            (false, true, PuzzleCell::Empty) => 3,
+            (false, true, PuzzleCell::Cross) => 4,
+            (false, true, PuzzleCell::Full) => 5,
+            (true, false, PuzzleCell::Empty) => 6,
+            (true, false, PuzzleCell::Cross) => 7,
+            (true, false, PuzzleCell::Full) => 8,
+            (true, true, PuzzleCell::Empty) => 9,
+            (true, true, PuzzleCell::Cross) => 10,
+            (true, true, PuzzleCell::Full) => 11,
+        };
+        self.0[index]
+    }
+    fn square_right(&self) -> &'static Image {
+        self.0[12]
+    }
+    fn square_bottom(&self) -> &'static Image {
+        self.0[13]
+    }
+    fn square_bottom_right(&self) -> &'static Image {
+        self.0[14]
+    }
+    fn square_hover(&self) -> &'static Image {
+        self.0[15]
+    }
+
+    fn number(&self, num: u8) -> &'static Image {
+        self.0[num as usize + 15]
+    }
+    fn number_dim(&self, num: u8) -> &'static Image {
+        self.0[num as usize + 35]
+    }
+}
+
+const GAME_ASSETS_1X: [&Image; 56] = [
+    &assets::SQUARE_DD_EMPTY,
+    &assets::SQUARE_DD_CROSS,
+    &assets::SQUARE_DD_FULL,
+    &assets::SQUARE_DB_EMPTY,
+    &assets::SQUARE_DB_CROSS,
+    &assets::SQUARE_DB_FULL,
+    &assets::SQUARE_BD_EMPTY,
+    &assets::SQUARE_BD_CROSS,
+    &assets::SQUARE_BD_FULL,
+    &assets::SQUARE_BB_EMPTY,
+    &assets::SQUARE_BB_CROSS,
+    &assets::SQUARE_BB_FULL,
+    &assets::SQUARE_RIGHT,
+    &assets::SQUARE_BOTTOM,
+    &assets::SQUARE_BOTTOM_RIGHT,
+    &assets::SQUARE_HOVER,
     &assets::NUMBER_1,
     &assets::NUMBER_2,
     &assets::NUMBER_3,
@@ -470,9 +528,6 @@ const NUMBERS: [&Image; 20] = [
     &assets::NUMBER_18,
     &assets::NUMBER_19,
     &assets::NUMBER_20,
-];
-
-const NUMBERS_DIM: [&Image; 20] = [
     &assets::NUMBER_1_DIM,
     &assets::NUMBER_2_DIM,
     &assets::NUMBER_3_DIM,
@@ -493,4 +548,63 @@ const NUMBERS_DIM: [&Image; 20] = [
     &assets::NUMBER_18_DIM,
     &assets::NUMBER_19_DIM,
     &assets::NUMBER_20_DIM,
+];
+
+const GAME_ASSETS_2X: [&Image; 56] = [
+    &assets::SQUARE_DD_EMPTY_2X,
+    &assets::SQUARE_DD_CROSS_2X,
+    &assets::SQUARE_DD_FULL_2X,
+    &assets::SQUARE_DB_EMPTY_2X,
+    &assets::SQUARE_DB_CROSS_2X,
+    &assets::SQUARE_DB_FULL_2X,
+    &assets::SQUARE_BD_EMPTY_2X,
+    &assets::SQUARE_BD_CROSS_2X,
+    &assets::SQUARE_BD_FULL_2X,
+    &assets::SQUARE_BB_EMPTY_2X,
+    &assets::SQUARE_BB_CROSS_2X,
+    &assets::SQUARE_BB_FULL_2X,
+    &assets::SQUARE_RIGHT_2X,
+    &assets::SQUARE_BOTTOM_2X,
+    &assets::SQUARE_BOTTOM_RIGHT_2X,
+    &assets::SQUARE_HOVER_2X,
+    &assets::NUMBER_1_2X,
+    &assets::NUMBER_2_2X,
+    &assets::NUMBER_3_2X,
+    &assets::NUMBER_4_2X,
+    &assets::NUMBER_5_2X,
+    &assets::NUMBER_6_2X,
+    &assets::NUMBER_7_2X,
+    &assets::NUMBER_8_2X,
+    &assets::NUMBER_9_2X,
+    &assets::NUMBER_10_2X,
+    &assets::NUMBER_11_2X,
+    &assets::NUMBER_12_2X,
+    &assets::NUMBER_13_2X,
+    &assets::NUMBER_14_2X,
+    &assets::NUMBER_15_2X,
+    &assets::NUMBER_16_2X,
+    &assets::NUMBER_17_2X,
+    &assets::NUMBER_18_2X,
+    &assets::NUMBER_19_2X,
+    &assets::NUMBER_20_2X,
+    &assets::NUMBER_1_DIM_2X,
+    &assets::NUMBER_2_DIM_2X,
+    &assets::NUMBER_3_DIM_2X,
+    &assets::NUMBER_4_DIM_2X,
+    &assets::NUMBER_5_DIM_2X,
+    &assets::NUMBER_6_DIM_2X,
+    &assets::NUMBER_7_DIM_2X,
+    &assets::NUMBER_8_DIM_2X,
+    &assets::NUMBER_9_DIM_2X,
+    &assets::NUMBER_10_DIM_2X,
+    &assets::NUMBER_11_DIM_2X,
+    &assets::NUMBER_12_DIM_2X,
+    &assets::NUMBER_13_DIM_2X,
+    &assets::NUMBER_14_DIM_2X,
+    &assets::NUMBER_15_DIM_2X,
+    &assets::NUMBER_16_DIM_2X,
+    &assets::NUMBER_17_DIM_2X,
+    &assets::NUMBER_18_DIM_2X,
+    &assets::NUMBER_19_DIM_2X,
+    &assets::NUMBER_20_DIM_2X,
 ];
