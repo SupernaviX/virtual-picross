@@ -266,7 +266,7 @@ impl Game {
                             break;
                         }
                         Some(PuzzleCell::Empty) => {
-                            break 'outer;
+                            continue 'outer;
                         }
                         Some(PuzzleCell::Full) => {
                             continue;
