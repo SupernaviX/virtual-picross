@@ -3,6 +3,7 @@
 
 mod assets;
 mod game;
+mod menu;
 mod puzzle;
 mod state;
 
@@ -10,6 +11,7 @@ use vb_graphics as gfx;
 
 use crate::{
     game::Game,
+    menu::Menu,
     puzzle::{BOMBERMAN_BLOCK, GOLF_BALL},
     state::GameState,
 };
@@ -28,19 +30,44 @@ fn main() {
     gfx::set_bkcol(0);
     gfx::load_character_data(&assets::ALL, 0);
 
+    let mut state = GameState::new();
+
+    let mut menu = Menu::new();
     let mut game = Game::new();
     game.load_puzzle(&GOLF_BALL);
     game.load_puzzle(&BOMBERMAN_BLOCK);
-    let mut state = GameState::new();
+
+    let mut active = ActiveScreen::Menu;
 
     FRAME.enable_interrupts();
 
     loop {
-        game.draw();
+        match active {
+            ActiveScreen::Menu => menu.draw(),
+            ActiveScreen::Game => game.draw(),
+        };
 
         state.update();
-        game.update(&state);
+
+        match active {
+            ActiveScreen::Menu => {
+                if let Some(puzzle) = menu.update(&state) {
+                    game.load_puzzle(puzzle);
+                    active = ActiveScreen::Game;
+                }
+            }
+            ActiveScreen::Game => {
+                if game.update(&state) {
+                    active = ActiveScreen::Menu;
+                }
+            }
+        }
 
         FRAME.wait_for_new_frame();
     }
+}
+
+enum ActiveScreen {
+    Menu,
+    Game,
 }

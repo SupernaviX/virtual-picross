@@ -25,7 +25,6 @@ pub struct Game {
     cursor: (usize, usize),
     cursor_behavior: Option<PuzzleCell>,
     cursor_delay: u8,
-    held: [u32; 4],
     solved: bool,
 }
 
@@ -39,7 +38,6 @@ impl Game {
             cursor: (0, 0),
             cursor_behavior: None,
             cursor_delay: 0,
-            held: [0; 4],
             solved: false,
         }
     }
@@ -58,7 +56,6 @@ impl Game {
         self.cursor = (0, 0);
         self.cursor_behavior = None;
         self.cursor_delay = 0;
-        self.held = [0; 4];
         self.solved = false;
     }
 
@@ -322,20 +319,16 @@ impl Game {
             .all(|c| matches!(c, PuzzleCell::Empty | PuzzleCell::Cross))
     }
 
-    pub fn update(&mut self, state: &GameState) {
+    pub fn update(&mut self, state: &GameState) -> bool {
         if self.solved {
-            return;
+            let pressed = state.buttons_pressed();
+            return pressed.a() || pressed.sta();
         }
 
-        let held = state.buttons_held();
+        let held = state.directions_held();
         let mut cursor_moved = false;
-        let mut handle_move = |button: bool, counter: &mut u32, delta: (isize, isize)| {
-            if button {
-                *counter += 1;
-            } else {
-                *counter = 0;
-            }
-            if *counter == 1 || *counter > 10 && self.cursor_delay == 0 {
+        let mut handle_move = |button: bool, delta: (isize, isize)| {
+            if button && self.cursor_delay == 0 {
                 let new_x = (self.cursor.0 as isize + delta.0)
                     .rem_euclid(self.puzzle.width as isize) as usize;
                 let new_y = (self.cursor.1 as isize + delta.1)
@@ -347,10 +340,10 @@ impl Game {
             }
         };
 
-        handle_move(held.ll(), &mut self.held[0], (-1, 0));
-        handle_move(held.lr(), &mut self.held[1], (1, 0));
-        handle_move(held.lu(), &mut self.held[2], (0, -1));
-        handle_move(held.ld(), &mut self.held[3], (0, 1));
+        handle_move(held.ll(), (-1, 0));
+        handle_move(held.lr(), (1, 0));
+        handle_move(held.lu(), (0, -1));
+        handle_move(held.ld(), (0, 1));
 
         if cursor_moved {
             self.cursor_delay = 4;
@@ -374,6 +367,7 @@ impl Game {
             };
             self.cursor_behavior = Some(new_cell);
         }
+        let held = state.buttons_held();
         if !held.a() && !held.b() {
             self.cursor_behavior = None;
         }
@@ -388,6 +382,7 @@ impl Game {
                 self.solved = true;
             }
         }
+        false
     }
 
     fn has_been_solved(&self) -> bool {

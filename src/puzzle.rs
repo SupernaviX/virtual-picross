@@ -53,3 +53,21 @@ pub const BOMBERMAN_BLOCK: Puzzle = Puzzle {
     height: 15,
     cells: &BOMBERMAN_BLOCK_CELLS,
 };
+
+pub const PUZZLES: [Puzzle; 15] = [
+    GOLF_BALL,
+    BOMBERMAN_BLOCK,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+];
