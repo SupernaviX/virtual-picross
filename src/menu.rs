@@ -1,3 +1,6 @@
+use core::fmt::Write as _;
+
+use vb_graphics::text::TextRenderer;
 use vb_rt::sys::vip;
 
 use crate::{
@@ -11,16 +14,20 @@ const BG: u8 = 2;
 pub struct Menu {
     index: usize,
     cursor_delay: u8,
+    renderer: TextRenderer,
 }
 
 impl Menu {
     pub fn new() -> Self {
-        assets::MENU_ITEM.render_to_bgmap(BG, (0, 0));
-        assets::MENU_ITEM_SELECTED.render_to_bgmap(BG, (4, 0));
-        Self {
+        let renderer = TextRenderer::new(&assets::MENU, 512, (48, 10));
+        renderer.render_to_bgmap(BG, (0, 0));
+        let mut me = Self {
             index: 0,
             cursor_delay: 0,
-        }
+            renderer,
+        };
+        me.display_stats();
+        me
     }
 
     pub fn draw(&self) {
@@ -41,7 +48,7 @@ impl Menu {
 
         for (index, _puzzle) in PUZZLES.iter().take(15).enumerate() {
             let (row, col) = (index / 5, index % 5);
-            let dst = (16 + col as i16 * 72, 8 + row as i16 * 72);
+            let dst = (52 + col as i16 * 56, 8 + row as i16 * 56);
             let (menu_item, stereo) = if index == self.index {
                 (assets::MENU_ITEM_SELECTED, STEREO.with_jp(-4))
             } else {
@@ -51,6 +58,73 @@ impl Menu {
         }
 
         vip::SPT2.write(obj_index);
+        if !self.renderer.is_empty() {
+            let text_height = assets::MENU.line_height as i16;
+
+            let world = vip::WORLDS.index(next_world);
+            next_world -= 1;
+            world.header().write(
+                vip::WorldHeader::new()
+                    .with_bgm(vip::WorldMode::Normal)
+                    .with_lon(true)
+                    .with_ron(true)
+                    .with_bg_map_base(BG),
+            );
+            world.gx().write(8);
+            world.gy().write(184);
+            world.mx().write(0);
+            world.my().write(0);
+            world.w().write(96);
+            world.h().write(text_height);
+
+            let world = vip::WORLDS.index(next_world);
+            next_world -= 1;
+            world.header().write(
+                vip::WorldHeader::new()
+                    .with_bgm(vip::WorldMode::Normal)
+                    .with_lon(true)
+                    .with_ron(true)
+                    .with_bg_map_base(BG),
+            );
+            world.gx().write(8);
+            world.gy().write(184 + text_height);
+            world.mx().write(0);
+            world.my().write(text_height);
+            world.w().write(96);
+            world.h().write(text_height);
+
+            let world = vip::WORLDS.index(next_world);
+            next_world -= 1;
+            world.header().write(
+                vip::WorldHeader::new()
+                    .with_bgm(vip::WorldMode::Normal)
+                    .with_lon(true)
+                    .with_ron(true)
+                    .with_bg_map_base(BG),
+            );
+            world.gx().write(104);
+            world.gy().write(184);
+            world.mx().write(0);
+            world.my().write(text_height * 2);
+            world.w().write(287);
+            world.h().write(text_height);
+
+            let world = vip::WORLDS.index(next_world);
+            next_world -= 1;
+            world.header().write(
+                vip::WorldHeader::new()
+                    .with_bgm(vip::WorldMode::Normal)
+                    .with_lon(true)
+                    .with_ron(true)
+                    .with_bg_map_base(BG),
+            );
+            world.gx().write(104);
+            world.gy().write(184 + text_height);
+            world.mx().write(0);
+            world.my().write(text_height * 3);
+            world.w().write(287);
+            world.h().write(text_height);
+        }
 
         let world = vip::WORLDS.index(next_world);
         world.header().write(vip::WorldHeader::new().with_end(true));
@@ -75,15 +149,31 @@ impl Menu {
             self.index -= 5;
             cursor_moved = true;
         }
-        if held.ld() && self.index < PUZZLES.len() - 6 && self.cursor_delay == 0 {
+        if held.ld() && self.index < PUZZLES.len() - 5 && self.cursor_delay == 0 {
             self.index += 5;
             cursor_moved = true;
         }
         if cursor_moved {
             self.cursor_delay = 4;
+            self.display_stats();
         } else {
             self.cursor_delay = self.cursor_delay.saturating_sub(1);
         }
         None
+    }
+
+    fn display_stats(&mut self) {
+        let puzzle = &PUZZLES[self.index];
+
+        self.renderer.clear();
+        let _ = writeln!(&mut self.renderer, "id: {}", self.index + 1);
+        let _ = writeln!(
+            &mut self.renderer,
+            "size: {}x{}",
+            puzzle.width, puzzle.height
+        );
+        let _ = write!(&mut self.renderer, "title: ");
+        self.renderer.draw_text(puzzle.name);
+        let _ = write!(&mut self.renderer, "\ntime: 00:00:00");
     }
 }

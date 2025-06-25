@@ -7,14 +7,18 @@ imports = [
 file = "assets/virtual-boy.ttf"
 size = 32
 
+[font.menu]
+file = "assets/yoster.ttf"
+size = 14
+
 [image.menu-item]
 chardata = "all"
 file = "assets/menu.png"
 position = [0, 0]
-size = [64, 64]
+size = [56, 56]
 
 [image.menu-item-selected]
 chardata = "all"
 file = "assets/menu.png"
-position = [64, 0]
-size = [64, 64]
+position = [56, 0]
+size = [56, 56]
