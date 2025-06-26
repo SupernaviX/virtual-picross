@@ -5,7 +5,7 @@ use vb_rt::sys::vip;
 
 use crate::{
     assets,
-    puzzle::{PUZZLES, Puzzle},
+    puzzle::{ICONS, PUZZLES, Puzzle},
     state::GameState,
 };
 
@@ -21,6 +21,13 @@ impl Menu {
     pub fn new() -> Self {
         let renderer = TextRenderer::new(&assets::MENU, 512, (48, 10));
         renderer.render_to_bgmap(BG, (0, 0));
+        for row in 0..3 {
+            for col in 0..5 {
+                let dst = (col * 5, (row * 5) + 32);
+                let index = (5 * row + col) as usize;
+                ICONS[index].render_to_bgmap(BG, dst);
+            }
+        }
         let mut me = Self {
             index: 0,
             cursor_delay: 0,
@@ -54,6 +61,24 @@ impl Menu {
             } else {
                 (assets::MENU_ITEM, STEREO)
             };
+
+            let world = vip::WORLDS.index(next_world);
+            next_world -= 1;
+            world.header().write(
+                vip::WorldHeader::new()
+                    .with_bgm(vip::WorldMode::Normal)
+                    .with_lon(true)
+                    .with_ron(true)
+                    .with_bg_map_base(BG),
+            );
+            world.gx().write(dst.0 + 8);
+            world.gp().write(if index == self.index { -4 } else { 0 });
+            world.gy().write(dst.1 + 8);
+            world.mx().write((index as i16 % 5) * 40);
+            world.my().write(256 + (index as i16 / 5) * 40);
+            world.w().write(40);
+            world.h().write(40);
+
             obj_index = menu_item.render_to_objects(obj_index, dst, stereo);
         }
 
