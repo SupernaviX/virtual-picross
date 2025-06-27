@@ -51,7 +51,8 @@ fn main() {
                 }
             }
             ActiveScreen::Game => {
-                if game.update(&state) {
+                if let Some(time) = game.update(&state) {
+                    menu.finish_puzzle(time);
                     active = ActiveScreen::Menu;
                 }
             }

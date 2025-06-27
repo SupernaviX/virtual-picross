@@ -1,3 +1,5 @@
+use core::fmt::Write;
+
 use arrayvec::ArrayVec;
 use vb_graphics::{Image, text::TextRenderer};
 use vb_rt::sys::vip;
@@ -26,6 +28,8 @@ pub struct Game {
     cursor_behavior: Option<PuzzleCell>,
     cursor_delay: u8,
     solved: bool,
+    timer: u32,
+    timer_text: TextRenderer,
 }
 
 impl Game {
@@ -39,6 +43,8 @@ impl Game {
             cursor_behavior: None,
             cursor_delay: 0,
             solved: false,
+            timer: 0,
+            timer_text: TextRenderer::new(&assets::MENU, 640, (12, 2)),
         }
     }
 
@@ -57,6 +63,10 @@ impl Game {
         self.cursor_behavior = None;
         self.cursor_delay = 0;
         self.solved = false;
+        self.timer = 0;
+        self.timer_text.clear();
+        let _ = write!(&mut self.timer_text, "00:00:00");
+        self.timer_text.render_to_bgmap(1, (0, 0));
     }
 
     pub fn size_cells(&self) -> (usize, usize) {
@@ -180,6 +190,24 @@ impl Game {
         }
 
         vip::SPT2.write(obj_index);
+
+        let world = vip::WORLDS.index(next_world);
+        next_world -= 1;
+        world.header().write(
+            vip::WorldHeader::new()
+                .with_bgm(vip::WorldMode::Normal)
+                .with_lon(true)
+                .with_ron(true)
+                .with_bg_map_base(1),
+        );
+        world.gx().write(8);
+        world.gp().write(0);
+        world.gy().write(8);
+        world.mx().write(0);
+        world.my().write(0);
+        world.w().write(100);
+        world.h().write(20);
+
         if self.solved {
             let world = vip::WORLDS.index(next_world);
             next_world -= 1;
@@ -195,9 +223,10 @@ impl Game {
                     .with_bg_map_base(1),
             );
             world.gx().write(96 - text_width / 2);
+            world.gp().write(0);
             world.gy().write(112 - text_height / 2);
             world.mx().write(0);
-            world.my().write(0);
+            world.my().write(256);
             world.w().write(text_width);
             world.h().write(text_height);
         }
@@ -319,10 +348,25 @@ impl Game {
             .all(|c| matches!(c, PuzzleCell::Empty | PuzzleCell::Cross))
     }
 
-    pub fn update(&mut self, state: &GameState) -> bool {
+    pub fn update(&mut self, state: &GameState) -> Option<u32> {
         if self.solved {
             let pressed = state.buttons_pressed();
-            return pressed.a() || pressed.sta();
+            return (pressed.a() || pressed.sta()).then_some(self.timer);
+        }
+        self.timer += 1;
+        if self.timer % 50 == 0 {
+            let seconds = self.timer / 50;
+            let minutes = (seconds / 60) % 60;
+            let hours = seconds / 60 / 60;
+
+            self.timer_text.clear();
+            let _ = write!(
+                &mut self.timer_text,
+                "{:02}:{:02}:{:02}",
+                hours,
+                minutes,
+                seconds % 60
+            );
         }
 
         let held = state.directions_held();
@@ -378,11 +422,11 @@ impl Game {
             if self.has_been_solved() {
                 let mut renderer = TextRenderer::new(&assets::VIRTUAL_BOY, 256, (24, 14));
                 renderer.draw_text(self.puzzle.name);
-                renderer.render_to_bgmap(1, (0, 0));
+                renderer.render_to_bgmap(1, (0, 32));
                 self.solved = true;
             }
         }
-        false
+        None
     }
 
     fn has_been_solved(&self) -> bool {

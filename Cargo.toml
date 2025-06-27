@@ -5,9 +5,9 @@ edition = "2024"
 
 [dependencies]
 arrayvec = { version = "0.7", default-features = false }
-vb-graphics = { git = "https://github.com/SupernaviX/rust-vb-platform.git", rev = "a056f76" }
-vb-rt = { git = "https://github.com/SupernaviX/rust-vb-platform.git", rev = "a056f76" }
+vb-graphics = { git = "https://github.com/SupernaviX/rust-vb-platform.git", rev = "056f1b5" }
+vb-rt = { git = "https://github.com/SupernaviX/rust-vb-platform.git", rev = "056f1b5" }
 
 [build-dependencies]
-vb-graphics-build = { git = "https://github.com/SupernaviX/rust-vb-platform.git", rev = "a056f76" }
-vb-rt-build = { git = "https://github.com/SupernaviX/rust-vb-platform.git", rev = "a056f76" }
+vb-graphics-build = { git = "https://github.com/SupernaviX/rust-vb-platform.git", rev = "056f1b5" }
+vb-rt-build = { git = "https://github.com/SupernaviX/rust-vb-platform.git", rev = "056f1b5" }
