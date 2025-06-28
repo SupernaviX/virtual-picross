@@ -307,8 +307,20 @@ impl Game {
                     .enumerate()
                     .filter_map(|(i, n)| (*n == size).then_some(i))
                 {
-                    let is_valid = is_valid(&cells[..start], &solution[..solution_index])
-                        && is_valid(&cells[i + 1..], &solution[solution_index + 1..]);
+                    let cells_before = &cells[..start];
+                    let solution_before = &solution[..solution_index];
+                    let cells_after = if i < cells.len() {
+                        &cells[i + 1..]
+                    } else {
+                        &[]
+                    };
+                    let solution_after = if solution_index < solution.len() {
+                        &solution[solution_index + 1..]
+                    } else {
+                        &[]
+                    };
+                    let is_valid = is_valid(cells_before, solution_before)
+                        && is_valid(cells_after, solution_after);
                     if is_valid {
                         if !something_is_valid {
                             something_is_valid = true;

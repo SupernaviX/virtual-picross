@@ -41,6 +41,8 @@ fn main() {
             ActiveScreen::Game => game.draw(),
         };
 
+        FRAME.wait_for_new_frame();
+
         state.update();
 
         match active {
@@ -57,8 +59,6 @@ fn main() {
                 }
             }
         }
-
-        FRAME.wait_for_new_frame();
     }
 }
 
