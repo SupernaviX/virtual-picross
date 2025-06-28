@@ -301,6 +301,7 @@ impl Game {
                 }
                 let size = (i - start) as u8;
                 let mut something_is_valid = false;
+                let mut unique_possible_position = None;
                 for solution_index in solution
                     .iter()
                     .enumerate()
@@ -309,13 +310,20 @@ impl Game {
                     let is_valid = is_valid(&cells[..start], &solution[..solution_index])
                         && is_valid(&cells[i + 1..], &solution[solution_index + 1..]);
                     if is_valid {
-                        something_is_valid = true;
-                        possibilities[solution_index] += 1;
+                        if !something_is_valid {
+                            something_is_valid = true;
+                            unique_possible_position = Some(solution_index);
+                        } else {
+                            unique_possible_position = None;
+                        }
                     }
                 }
                 if !something_is_valid {
                     // couldn't find a solution for this closed group, so the player must have goofed
                     return solution.into_iter().map(|n| (n, false)).collect();
+                }
+                if let Some(solution_index) = unique_possible_position {
+                    possibilities[solution_index] += 1;
                 }
             } else {
                 i += 1;
@@ -456,13 +464,25 @@ fn is_valid(mut cells: &[PuzzleCell], solution: &[u8]) -> bool {
             cells = rest;
         }
         let old_cells = cells;
+        let mut full_seen = false;
         for _ in 0..count {
             let Some((next, rest)) = cells.split_first() else {
                 return false;
             };
             cells = rest;
-            if matches!(next, PuzzleCell::Cross) {
-                continue 'outer;
+            match next {
+                PuzzleCell::Empty => {}
+                PuzzleCell::Full => {
+                    full_seen = true;
+                }
+                PuzzleCell::Cross => {
+                    if full_seen {
+                        // found a group of cells not big enough to be the next group we need
+                        return false;
+                    } else {
+                        continue 'outer;
+                    }
+                }
             }
         }
         match cells.split_first() {
@@ -472,10 +492,16 @@ fn is_valid(mut cells: &[PuzzleCell], solution: &[u8]) -> bool {
                 if is_valid(rest, solution) {
                     return true;
                 }
+                if full_seen {
+                    return false;
+                }
             }
             Some((PuzzleCell::Cross, rest)) => {
                 if is_valid(rest, solution) {
                     return true;
+                }
+                if full_seen {
+                    return false;
                 }
                 // optimization: if the region we're inspecting ends with a cross,
                 // there's no room for the rest
