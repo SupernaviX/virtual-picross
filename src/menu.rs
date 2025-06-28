@@ -14,7 +14,7 @@ const BG: u8 = 2;
 pub struct Menu {
     index: usize,
     cursor_delay: u8,
-    times: [u32; PUZZLES.len()],
+    times: [Option<u32>; PUZZLES.len()],
     index_renderer: TextRenderer,
     size_renderer: TextRenderer,
     name_renderer: BufferedTextRenderer<32>,
@@ -41,7 +41,7 @@ impl Menu {
         let mut me = Self {
             index: 0,
             cursor_delay: 0,
-            times: [0; PUZZLES.len()],
+            times: [None; PUZZLES.len()],
             index_renderer,
             size_renderer,
             name_renderer: name_renderer.buffered(2),
@@ -67,7 +67,7 @@ impl Menu {
         let mut obj_index = 1023;
         vip::SPT3.write(obj_index);
 
-        for (index, _puzzle) in PUZZLES.iter().take(15).enumerate() {
+        for index in 0..15 {
             let (row, col) = (index / 5, index % 5);
             let dst = (52 + col as i16 * 56, 8 + row as i16 * 56);
             let (menu_item, stereo) = if index == self.index {
@@ -76,22 +76,24 @@ impl Menu {
                 (assets::MENU_ITEM, STEREO)
             };
 
-            let world = vip::WORLDS.index(next_world);
-            next_world -= 1;
-            world.header().write(
-                vip::WorldHeader::new()
-                    .with_bgm(vip::WorldMode::Normal)
-                    .with_lon(true)
-                    .with_ron(true)
-                    .with_bg_map_base(BG),
-            );
-            world.gx().write(dst.0 + 8);
-            world.gp().write(if index == self.index { -4 } else { 0 });
-            world.gy().write(dst.1 + 8);
-            world.mx().write((index as i16 % 5) * 40);
-            world.my().write(256 + (index as i16 / 5) * 40);
-            world.w().write(40);
-            world.h().write(40);
+            if self.times[index].is_some() {
+                let world = vip::WORLDS.index(next_world);
+                next_world -= 1;
+                world.header().write(
+                    vip::WorldHeader::new()
+                        .with_bgm(vip::WorldMode::Normal)
+                        .with_lon(true)
+                        .with_ron(true)
+                        .with_bg_map_base(BG),
+                );
+                world.gx().write(dst.0 + 8);
+                world.gp().write(if index == self.index { -4 } else { 0 });
+                world.gy().write(dst.1 + 8);
+                world.mx().write((index as i16 % 5) * 40);
+                world.my().write(256 + (index as i16 / 5) * 40);
+                world.w().write(40);
+                world.h().write(40);
+            }
 
             obj_index = menu_item.render_to_objects(obj_index, dst, stereo);
         }
@@ -208,13 +210,16 @@ impl Menu {
     }
 
     pub fn finish_puzzle(&mut self, time: u32) {
-        self.times[self.index] = time;
+        self.times[self.index] = Some(time);
         self.display_stats();
     }
 
     fn display_stats(&mut self) {
         let puzzle = &PUZZLES[self.index];
-        let seconds = self.times[self.index] / 50;
+        let (done, seconds) = match self.times[self.index] {
+            Some(time) => (true, time / 50),
+            None => (false, 0),
+        };
 
         self.index_renderer.clear();
         let _ = write!(&mut self.index_renderer, "id: {}", self.index + 1);
@@ -228,15 +233,20 @@ impl Menu {
 
         self.name_renderer.clear();
         let _ = write!(&mut self.name_renderer.inner, "title: ");
-        self.name_renderer.draw_text(puzzle.name);
+        if done {
+            self.name_renderer.draw_text(puzzle.name);
+        }
 
         self.time_renderer.clear();
-        let _ = write!(
-            &mut self.time_renderer,
-            "time: {:02}:{:02}:{:02}",
-            seconds / 60 / 60,
-            (seconds / 60) % 60,
-            seconds % 60,
-        );
+        let _ = write!(&mut self.time_renderer, "time: ");
+        if done {
+            let _ = write!(
+                &mut self.time_renderer,
+                "{:02}:{:02}:{:02}",
+                seconds / 60 / 60,
+                (seconds / 60) % 60,
+                seconds % 60,
+            );
+        }
     }
 }

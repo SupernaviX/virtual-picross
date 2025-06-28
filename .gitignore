@@ -1,4 +1,5 @@
 /target
 *.vb
 *.sram
+*.s
 .vscode
