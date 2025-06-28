@@ -30,6 +30,7 @@ pub struct Game {
     solved: bool,
     timer: u32,
     timer_text: TextRenderer,
+    victory_text: TextRenderer,
 }
 
 impl Game {
@@ -44,7 +45,8 @@ impl Game {
             cursor_delay: 0,
             solved: false,
             timer: 0,
-            timer_text: TextRenderer::new(&assets::MENU, 640, (12, 2)),
+            timer_text: TextRenderer::new(&assets::MENU, 656, (12, 2)),
+            victory_text: TextRenderer::new(&assets::VIRTUAL_BOY, 256, (24, 10)),
         }
     }
 
@@ -67,6 +69,9 @@ impl Game {
         self.timer_text.clear();
         let _ = write!(&mut self.timer_text, "00:00:00");
         self.timer_text.render_to_bgmap(1, (0, 0));
+        self.victory_text.clear();
+        let _ = self.victory_text.draw_text(self.puzzle.name);
+        self.victory_text.render_to_bgmap(1, (0, 32));
     }
 
     pub fn size_cells(&self) -> (usize, usize) {
@@ -212,7 +217,7 @@ impl Game {
             let world = vip::WORLDS.index(next_world);
             next_world -= 1;
 
-            let text_width = assets::VIRTUAL_BOY.measure(self.puzzle.name) as i16;
+            let text_width = self.victory_text.width();
             let text_height = assets::VIRTUAL_BOY.line_height as i16;
 
             world.header().write(
@@ -222,9 +227,11 @@ impl Game {
                     .with_ron(true)
                     .with_bg_map_base(1),
             );
-            world.gx().write(96 - text_width / 2);
+            world.gx().write(192 - text_width / 2);
             world.gp().write(0);
-            world.gy().write(112 - text_height / 2);
+            world
+                .gy()
+                .write(((puzzle_bottom as i16 + 224) / 2) - text_height / 2);
             world.mx().write(0);
             world.my().write(256);
             world.w().write(text_width);
@@ -440,9 +447,6 @@ impl Game {
             self.col_numbers[self.cursor.0] = self.col_count(self.cursor.0);
             self.row_numbers[self.cursor.1] = self.row_count(self.cursor.1);
             if self.has_been_solved() {
-                let mut renderer = TextRenderer::new(&assets::VIRTUAL_BOY, 256, (24, 14));
-                renderer.draw_text(self.puzzle.name);
-                renderer.render_to_bgmap(1, (0, 32));
                 self.solved = true;
             }
         }

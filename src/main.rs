@@ -32,6 +32,7 @@ fn main() {
     let mut game = Game::new();
 
     let mut active = ActiveScreen::Menu;
+    let mut transition = Some(Transition::FadeIn(0));
 
     FRAME.enable_interrupts();
 
@@ -45,24 +46,47 @@ fn main() {
 
         state.update();
 
-        match active {
-            ActiveScreen::Menu => {
-                if let Some(puzzle) = menu.update(&state) {
-                    game.load_puzzle(puzzle);
-                    active = ActiveScreen::Game;
+        match &mut transition {
+            Some(Transition::FadeIn(amount)) => {
+                *amount += 1;
+                gfx::set_colors(*amount, *amount * 2, *amount);
+                if *amount == 32 {
+                    transition = None;
                 }
             }
-            ActiveScreen::Game => {
-                if let Some(time) = game.update(&state) {
-                    menu.finish_puzzle(time);
-                    active = ActiveScreen::Menu;
+            Some(Transition::FadeOut(amount, next)) => {
+                *amount -= 1;
+                gfx::set_colors(*amount, *amount * 2, *amount);
+                if *amount == 0 {
+                    active = *next;
+                    transition = Some(Transition::FadeIn(0));
                 }
             }
+            None => match active {
+                ActiveScreen::Menu => {
+                    if let Some(puzzle) = menu.update(&state) {
+                        game.load_puzzle(puzzle);
+                        transition = Some(Transition::FadeOut(31, ActiveScreen::Game));
+                    }
+                }
+                ActiveScreen::Game => {
+                    if let Some(time) = game.update(&state) {
+                        menu.finish_puzzle(time);
+                        transition = Some(Transition::FadeOut(31, ActiveScreen::Menu));
+                    }
+                }
+            },
         }
     }
 }
 
+#[derive(Clone, Copy)]
 enum ActiveScreen {
     Menu,
     Game,
+}
+
+enum Transition {
+    FadeOut(u8, ActiveScreen),
+    FadeIn(u8),
 }
