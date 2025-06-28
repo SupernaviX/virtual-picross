@@ -112,8 +112,8 @@ impl Menu {
             world.gy().write(184);
             world.mx().write(0);
             world.my().write(0);
-            world.w().write(self.index_renderer.width());
-            world.h().write(text_height);
+            world.w().write(self.index_renderer.width() - 1);
+            world.h().write(text_height - 1);
         }
 
         if !self.size_renderer.is_empty() {
@@ -130,8 +130,8 @@ impl Menu {
             world.gy().write(184 + text_height);
             world.mx().write(0);
             world.my().write(16);
-            world.w().write(self.size_renderer.width());
-            world.h().write(text_height);
+            world.w().write(self.size_renderer.width() - 1);
+            world.h().write(text_height - 1);
         }
         if !self.name_renderer.is_empty() {
             let world = vip::WORLDS.index(next_world);
@@ -147,8 +147,8 @@ impl Menu {
             world.gy().write(184);
             world.mx().write(0);
             world.my().write(32);
-            world.w().write(self.name_renderer.width());
-            world.h().write(text_height);
+            world.w().write(self.name_renderer.width() - 1);
+            world.h().write(text_height - 1);
         }
 
         if !self.time_renderer.is_empty() {
@@ -165,8 +165,8 @@ impl Menu {
             world.gy().write(184 + text_height);
             world.mx().write(0);
             world.my().write(48);
-            world.w().write(self.time_renderer.width());
-            world.h().write(text_height);
+            world.w().write(self.time_renderer.width() - 1);
+            world.h().write(text_height - 1);
         }
 
         let world = vip::WORLDS.index(next_world);

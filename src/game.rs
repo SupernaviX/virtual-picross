@@ -205,7 +205,7 @@ impl Game {
         world.gy().write(8);
         world.mx().write(0);
         world.my().write(0);
-        world.w().write(100);
+        world.w().write(self.timer_text.width() - 1);
         world.h().write(20);
 
         if self.solved {
