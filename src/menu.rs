@@ -1,6 +1,6 @@
 use core::fmt::Write as _;
 
-use vb_graphics::text::TextRenderer;
+use vb_graphics::text::{BufferedTextRenderer, TextRenderer};
 use vb_rt::sys::vip;
 
 use crate::{
@@ -17,7 +17,7 @@ pub struct Menu {
     times: [u32; PUZZLES.len()],
     index_renderer: TextRenderer,
     size_renderer: TextRenderer,
-    name_renderer: TextRenderer,
+    name_renderer: BufferedTextRenderer<32>,
     time_renderer: TextRenderer,
 }
 
@@ -44,7 +44,7 @@ impl Menu {
             times: [0; PUZZLES.len()],
             index_renderer,
             size_renderer,
-            name_renderer,
+            name_renderer: name_renderer.buffered(2),
             time_renderer,
         };
         me.display_stats();
@@ -112,7 +112,7 @@ impl Menu {
             world.gy().write(184);
             world.mx().write(0);
             world.my().write(0);
-            world.w().write(96);
+            world.w().write(self.index_renderer.width());
             world.h().write(text_height);
         }
 
@@ -130,7 +130,7 @@ impl Menu {
             world.gy().write(184 + text_height);
             world.mx().write(0);
             world.my().write(16);
-            world.w().write(96);
+            world.w().write(self.size_renderer.width());
             world.h().write(text_height);
         }
         if !self.name_renderer.is_empty() {
@@ -147,7 +147,7 @@ impl Menu {
             world.gy().write(184);
             world.mx().write(0);
             world.my().write(32);
-            world.w().write(287);
+            world.w().write(self.name_renderer.width());
             world.h().write(text_height);
         }
 
@@ -165,7 +165,7 @@ impl Menu {
             world.gy().write(184 + text_height);
             world.mx().write(0);
             world.my().write(48);
-            world.w().write(287);
+            world.w().write(self.time_renderer.width());
             world.h().write(text_height);
         }
 
@@ -174,6 +174,8 @@ impl Menu {
     }
 
     pub fn update(&mut self, state: &GameState) -> Option<&'static Puzzle> {
+        self.name_renderer.update();
+
         let pressed = state.buttons_pressed();
         if pressed.a() {
             return PUZZLES.get(self.index);
@@ -225,7 +227,7 @@ impl Menu {
         );
 
         self.name_renderer.clear();
-        let _ = write!(&mut self.name_renderer, "title: ");
+        let _ = write!(&mut self.name_renderer.inner, "title: ");
         self.name_renderer.draw_text(puzzle.name);
 
         self.time_renderer.clear();

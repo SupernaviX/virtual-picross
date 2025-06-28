@@ -269,15 +269,16 @@ checksum = "5a5f39404a5da50712a4c1eecf25e90dd62b613502b7e925fd4e4d19b5c96512"
 [[package]]
 name = "vb-graphics"
 version = "0.1.0"
-source = "git+https://github.com/SupernaviX/rust-vb-platform.git?rev=056f1b5#056f1b56f49e5424f757831a98dcc19220f49a67"
+source = "git+https://github.com/SupernaviX/rust-vb-platform.git?rev=4a129d7#4a129d760844ccafd0c301d6e99356c062b3ee9e"
 dependencies = [
+ "arrayvec",
  "vb-rt",
 ]
 
 [[package]]
 name = "vb-graphics-build"
 version = "0.1.0"
-source = "git+https://github.com/SupernaviX/rust-vb-platform.git?rev=056f1b5#056f1b56f49e5424f757831a98dcc19220f49a67"
+source = "git+https://github.com/SupernaviX/rust-vb-platform.git?rev=4a129d7#4a129d760844ccafd0c301d6e99356c062b3ee9e"
 dependencies = [
  "anyhow",
  "bitfield-struct",
@@ -290,7 +291,7 @@ dependencies = [
 [[package]]
 name = "vb-rt"
 version = "0.1.0"
-source = "git+https://github.com/SupernaviX/rust-vb-platform.git?rev=056f1b5#056f1b56f49e5424f757831a98dcc19220f49a67"
+source = "git+https://github.com/SupernaviX/rust-vb-platform.git?rev=4a129d7#4a129d760844ccafd0c301d6e99356c062b3ee9e"
 dependencies = [
  "bitfield-struct",
 ]
@@ -298,7 +299,7 @@ dependencies = [
 [[package]]
 name = "vb-rt-build"
 version = "0.1.0"
-source = "git+https://github.com/SupernaviX/rust-vb-platform.git?rev=056f1b5#056f1b56f49e5424f757831a98dcc19220f49a67"
+source = "git+https://github.com/SupernaviX/rust-vb-platform.git?rev=4a129d7#4a129d760844ccafd0c301d6e99356c062b3ee9e"
 
 [[package]]
 name = "virtual-picross"
