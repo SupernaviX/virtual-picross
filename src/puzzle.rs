@@ -108,81 +108,96 @@ pub const EMPTY: Puzzle = Puzzle {
     cells: &[],
 };
 
-#[rustfmt::skip]
-const GOLF_BALL_CELLS: [u8; 5 * 5] = [
-    0, 0, 1, 0, 0,
-    0, 1, 1, 1, 0,
-    1, 1, 1, 1, 1,
-    0, 1, 1, 1, 0,
-    0, 0, 1, 0, 0,
-];
+const fn format_puzzle<const N: usize>(input: &[u8]) -> [u8; N] {
+    let mut result = [0; N];
+    let mut src_index = 0;
+    let mut dst_index = 0;
+    while src_index < input.len() {
+        if input[src_index] == b'x' {
+            result[dst_index] = 1;
+            dst_index += 1;
+        } else if input[src_index] == b'-' {
+            dst_index += 1;
+        }
+        src_index += 1;
+    }
+    assert!(dst_index == N);
+    result
+}
 
-pub const GOLF_BALL: Puzzle = Puzzle {
-    name: b"Golf Ball",
-    source: b"Golf",
-    width: 5,
-    height: 5,
-    cells: &GOLF_BALL_CELLS,
-};
+macro_rules! puzzle {
+    ($name:expr, $source:expr, ($width:expr, $height:expr), $puzzle:expr) => {{
+        const PUZZLE_CELLS: [u8; $width * $height] = format_puzzle($puzzle);
+        Puzzle {
+            name: $name,
+            source: $source,
+            width: $width,
+            height: $height,
+            cells: &PUZZLE_CELLS,
+        }
+    }};
+}
 
-#[rustfmt::skip]
-const BOMBERMAN_BLOCK_CELLS: [u8; 15 * 15] = [
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
-    0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0,
-    0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0,
-    0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0,
-    0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0,
-    0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0,
-    0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0,
-    1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
-    1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
-    0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0,
-    0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0,
-    0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
-    0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
-    0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-];
+pub const GOLF_BALL: Puzzle = puzzle!(
+    b"Golf Ball",
+    b"Golf",
+    (5, 5),
+    b"
+    --x--
+    -xxx-
+    xxxxx
+    -xxx-
+    --x--"
+);
 
-pub const BOMBERMAN_BLOCK: Puzzle = Puzzle {
-    name: b"Bomberman Block",
-    source: b"Panic Bomber",
-    width: 15,
-    height: 15,
-    cells: &BOMBERMAN_BLOCK_CELLS,
-};
+pub const BOMBERMAN_BLOCK: Puzzle = puzzle!(
+    b"Bomberman Block",
+    b"Panic Bomber",
+    (15, 15),
+    b"
+    ------------xx-
+    -----xxxxx--xx-
+    ---xxxxxxxxx---
+    --xx------xxx--
+    --x--x--x--xx--
+    -x---x--x---xx-
+    -x---x--x----x-
+    xx-----------xx
+    xx-----------xx
+    -x---xxxxx---x-
+    -xx-xxxxxxx-xx-
+    --xxxxxxxxxxx--
+    --xxxxxxxxxxx--
+    ---xxxxxxxxx---
+    ---------------"
+);
 
-#[rustfmt::skip]
-pub const HOMING_MISSILES_CELLS: [u8; 20 * 20] = [
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,
-    0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,
-    1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0,
-    1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0,
-    1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
-    0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0,
-    0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0,
-    0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0,
-    0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0,
-    0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
-    0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0,
-    0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
-    0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
-];
-
-pub const HOMING_MISSILES: Puzzle = Puzzle {
-    name: b"Homing Missiles",
-    source: b"Red Alarm",
-    width: 20,
-    height: 20,
-    cells: &HOMING_MISSILES_CELLS,
-};
+pub const HOMING_MISSILES: Puzzle = puzzle!(
+    b"Homing Missiles",
+    b"Red Alarm",
+    (20, 20),
+    b"
+    ---------x----------
+    ---------x----------
+    -x------xxx------x--
+    -x------xxx------x--
+    xxx-----x-x-----xxx-
+    xxx-------------xxx-
+    x-x------x------x-x-
+    ---------x----------
+    -x-------x-------x--
+    -x----x--x--x----x--
+    ------x-xxx-x-------
+    ------x-xxx-x-------
+    -x----xxxxxxx----x--
+    -x---xxxxxxxxx---x--
+    -----xxxxxxxxx------
+    --x-xxxxxxxxxxx-x---
+    ---xxxxxxxxxxxxx----
+    ----xxx-xxx-xxx-----
+    -----xx--x--xx------
+    ------x-----x-------"
+);
 
 pub const PUZZLES: [Puzzle; 15] = [
     GOLF_BALL,
