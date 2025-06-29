@@ -28,9 +28,9 @@ impl Menu {
         index_renderer.render_to_bgmap(BG, (0, 0));
         let size_renderer = TextRenderer::new(&assets::MENU, 536, (12, 2));
         size_renderer.render_to_bgmap(BG, (0, 2));
-        let name_renderer = TextRenderer::new(&assets::MENU, 560, (28, 2));
+        let name_renderer = TextRenderer::new(&assets::MENU, 560, (28, 3));
         name_renderer.render_to_bgmap(BG, (0, 4));
-        let time_renderer = TextRenderer::new(&assets::MENU, 616, (20, 2));
+        let time_renderer = TextRenderer::new(&assets::MENU, 644, (20, 2));
         time_renderer.render_to_bgmap(BG, (0, 6));
         for row in 0..3 {
             for col in 0..5 {
