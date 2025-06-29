@@ -110,6 +110,13 @@ file = "squares.png"
 position = [48, 0]
 size = [9, 9]
 
+[image.square-final-2x]
+chardata = "all"
+scale = 2
+file = "squares.png"
+position = [32, 16]
+size = [8, 8]
+
 [image.number-1-2x]
 chardata = "all"
 scale = 2

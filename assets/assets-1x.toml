@@ -94,6 +94,12 @@ file = "squares.png"
 position = [48, 0]
 size = [9, 9]
 
+[image.square-final]
+chardata = "all"
+file = "squares.png"
+position = [32, 16]
+size = [8, 8]
+
 [image.number-1]
 chardata = "all"
 file = "numbers.png"

@@ -1,7 +1,10 @@
 use core::fmt::Write;
 
 use arrayvec::ArrayVec;
-use vb_graphics::{Image, text::TextRenderer};
+use vb_graphics::{
+    Image,
+    text::{BufferedTextRenderer, TextRenderer},
+};
 use vb_rt::sys::vip;
 
 use crate::{
@@ -17,6 +20,25 @@ enum PuzzleCell {
     Full,
 }
 
+enum Zoom {
+    One,
+    Two,
+}
+impl Zoom {
+    fn cell_pixels(&self) -> usize {
+        match self {
+            Self::One => 8,
+            Self::Two => 16,
+        }
+    }
+}
+
+enum PuzzleState {
+    Playing,
+    Moving,
+    ShowingText,
+}
+
 const MAX_PUZZLE_SIZE: usize = 15;
 
 pub struct Game {
@@ -24,13 +46,15 @@ pub struct Game {
     cells: [PuzzleCell; MAX_PUZZLE_SIZE * MAX_PUZZLE_SIZE],
     row_numbers: ArrayVec<ArrayVec<(u8, bool), MAX_PUZZLE_SIZE>, MAX_PUZZLE_SIZE>,
     col_numbers: ArrayVec<ArrayVec<(u8, bool), MAX_PUZZLE_SIZE>, MAX_PUZZLE_SIZE>,
+    puzzle_pos: (usize, usize),
+    zoom: Zoom,
     cursor: (usize, usize),
     cursor_behavior: Option<PuzzleCell>,
     cursor_delay: u8,
-    solved: bool,
+    state: PuzzleState,
     timer: u32,
     timer_text: TextRenderer,
-    victory_text: TextRenderer,
+    victory_text: BufferedTextRenderer<64>,
 }
 
 impl Game {
@@ -40,13 +64,15 @@ impl Game {
             cells: [PuzzleCell::Empty; MAX_PUZZLE_SIZE * MAX_PUZZLE_SIZE],
             row_numbers: ArrayVec::new(),
             col_numbers: ArrayVec::new(),
+            puzzle_pos: (192, 112),
+            zoom: Zoom::One,
             cursor: (0, 0),
             cursor_behavior: None,
             cursor_delay: 0,
-            solved: false,
+            state: PuzzleState::Playing,
             timer: 0,
             timer_text: TextRenderer::new(&assets::MENU, 656, (12, 2)),
-            victory_text: TextRenderer::new(&assets::VIRTUAL_BOY, 256, (24, 10)),
+            victory_text: TextRenderer::new(&assets::VIRTUAL_BOY, 256, (24, 10)).buffered(3),
         }
     }
 
@@ -61,10 +87,27 @@ impl Game {
         self.col_numbers = (0..self.puzzle.width)
             .map(|col| self.col_count(col))
             .collect();
+
+        let (width_cells, height_cells) = self.size_cells();
+        self.zoom = if width_cells >= 24 || height_cells >= 14 {
+            Zoom::One
+        } else {
+            Zoom::Two
+        };
+        let cell_pixels = self.zoom.cell_pixels();
+        let x_offset = (384 - width_cells * cell_pixels) / 2;
+        let y_offset = (224 - height_cells * cell_pixels) / 2;
+
+        let puzzle_right = 384 - cell_pixels - x_offset;
+        let puzzle_bottom = 224 - cell_pixels - y_offset;
+        let puzzle_left = puzzle_right - (self.puzzle.width * cell_pixels);
+        let puzzle_top = puzzle_bottom - (self.puzzle.height * cell_pixels);
+        self.puzzle_pos = (puzzle_left, puzzle_top);
+
         self.cursor = (0, 0);
         self.cursor_behavior = None;
         self.cursor_delay = 0;
-        self.solved = false;
+        self.state = PuzzleState::Playing;
         self.timer = 0;
         self.timer_text.clear();
         let _ = write!(&mut self.timer_text, "00:00:00");
@@ -110,53 +153,64 @@ impl Game {
         let mut obj_index = 1023;
         vip::SPT3.write(obj_index);
 
-        let (width_cells, height_cells) = self.size_cells();
-        let (cell_pixels, game_assets) = if width_cells >= 24 || height_cells >= 14 {
-            (8, GameAssets(&GAME_ASSETS_1X))
-        } else {
-            (16, GameAssets(&GAME_ASSETS_2X))
+        let (puzzle_left, puzzle_top) = self.puzzle_pos;
+        let (cell_pixels, game_assets) = match self.zoom {
+            Zoom::One => (8, GameAssets(&GAME_ASSETS_1X)),
+            Zoom::Two => (16, GameAssets(&GAME_ASSETS_2X)),
         };
-        let x_offset = (384 - width_cells * cell_pixels) / 2;
-        let y_offset = (224 - height_cells * cell_pixels) / 2;
 
-        let puzzle_right = 384 - cell_pixels - x_offset;
-        let puzzle_bottom = 224 - cell_pixels - y_offset;
-        let puzzle_left = puzzle_right - (self.puzzle.width * cell_pixels);
-        let puzzle_top = puzzle_bottom - (self.puzzle.height * cell_pixels);
+        let puzzle_right = puzzle_left + (self.puzzle.width * cell_pixels);
+        let puzzle_bottom = puzzle_top + (self.puzzle.height * cell_pixels);
 
         for row in 0..self.puzzle.height {
             for col in 0..self.puzzle.width {
                 let col_bright = col > 0 && col % 5 == 0;
                 let row_bright = row > 0 && row % 5 == 0;
-                let cell = self.cells[row * self.puzzle.width + col];
-                let image = game_assets.square(col_bright, row_bright, cell);
+                if let PuzzleState::ShowingText = self.state {
+                    let answer = self.puzzle.cells[row * self.puzzle.width + col];
+                    if answer == 1 {
+                        let image = game_assets.square_final();
+                        let dst = (
+                            (puzzle_left + col * cell_pixels) as i16,
+                            (puzzle_top + row * cell_pixels) as i16,
+                        );
+                        obj_index = image.render_to_objects(obj_index, dst, STEREO);
+                    }
+                } else {
+                    let cell = self.cells[row * self.puzzle.width + col];
+                    let image = game_assets.square(col_bright, row_bright, cell);
+                    let dst = (
+                        (puzzle_left + col * cell_pixels) as i16,
+                        (puzzle_top + row * cell_pixels) as i16,
+                    );
+                    obj_index = image.render_to_objects(obj_index, dst, STEREO);
+                }
+            }
+            if let PuzzleState::Playing | PuzzleState::Moving = self.state {
+                let dst = (puzzle_right as i16, (puzzle_top + row * cell_pixels) as i16);
+                obj_index = game_assets
+                    .square_right()
+                    .render_to_objects(obj_index, dst, STEREO);
+            }
+        }
+        if let PuzzleState::Playing | PuzzleState::Moving = self.state {
+            for col in 0..self.puzzle.width {
                 let dst = (
                     (puzzle_left + col * cell_pixels) as i16,
-                    (puzzle_top + row * cell_pixels) as i16,
+                    puzzle_bottom as i16,
                 );
-                obj_index = image.render_to_objects(obj_index, dst, STEREO);
+                obj_index = game_assets
+                    .square_bottom()
+                    .render_to_objects(obj_index, dst, STEREO);
             }
-            let dst = (puzzle_right as i16, (puzzle_top + row * cell_pixels) as i16);
-            obj_index = game_assets
-                .square_right()
-                .render_to_objects(obj_index, dst, STEREO);
-        }
-        for col in 0..self.puzzle.width {
-            let dst = (
-                (puzzle_left + col * cell_pixels) as i16,
-                puzzle_bottom as i16,
+            obj_index = game_assets.square_bottom_right().render_to_objects(
+                obj_index,
+                (puzzle_right as i16, puzzle_bottom as i16),
+                STEREO,
             );
-            obj_index = game_assets
-                .square_bottom()
-                .render_to_objects(obj_index, dst, STEREO);
         }
-        obj_index = game_assets.square_bottom_right().render_to_objects(
-            obj_index,
-            (puzzle_right as i16, puzzle_bottom as i16),
-            STEREO,
-        );
 
-        if !self.solved {
+        if let PuzzleState::Playing = self.state {
             let cursor_x = (puzzle_left + self.cursor.0 * cell_pixels) as i16;
             let cursor_y = (puzzle_top + self.cursor.1 * cell_pixels) as i16;
             obj_index = game_assets.square_hover().render_to_objects(
@@ -164,33 +218,33 @@ impl Game {
                 (cursor_x, cursor_y),
                 STEREO,
             );
-        }
 
-        for (row, numbers) in self.row_numbers.iter().enumerate() {
-            let mut num_x = (puzzle_left - 2 * cell_pixels) as i16;
-            let num_y = (puzzle_top + row * cell_pixels) as i16;
-            for &(num, solved) in numbers.iter().rev() {
-                let image = if solved {
-                    game_assets.number_dim(num)
-                } else {
-                    game_assets.number(num)
-                };
-                obj_index = image.render_to_objects(obj_index, (num_x, num_y), STEREO);
-                num_x -= cell_pixels as i16;
+            for (row, numbers) in self.row_numbers.iter().enumerate() {
+                let mut num_x = (puzzle_left - 2 * cell_pixels) as i16;
+                let num_y = (puzzle_top + row * cell_pixels) as i16;
+                for &(num, solved) in numbers.iter().rev() {
+                    let image = if solved {
+                        game_assets.number_dim(num)
+                    } else {
+                        game_assets.number(num)
+                    };
+                    obj_index = image.render_to_objects(obj_index, (num_x, num_y), STEREO);
+                    num_x -= cell_pixels as i16;
+                }
             }
-        }
 
-        for (col, numbers) in self.col_numbers.iter().enumerate() {
-            let num_x = (puzzle_left + col * cell_pixels) as i16;
-            let mut num_y = (puzzle_top - 2 * cell_pixels) as i16;
-            for &(num, solved) in numbers.iter().rev() {
-                let image = if solved {
-                    game_assets.number_dim(num)
-                } else {
-                    game_assets.number(num)
-                };
-                obj_index = image.render_to_objects(obj_index, (num_x, num_y), STEREO);
-                num_y -= cell_pixels as i16;
+            for (col, numbers) in self.col_numbers.iter().enumerate() {
+                let num_x = (puzzle_left + col * cell_pixels) as i16;
+                let mut num_y = (puzzle_top - 2 * cell_pixels) as i16;
+                for &(num, solved) in numbers.iter().rev() {
+                    let image = if solved {
+                        game_assets.number_dim(num)
+                    } else {
+                        game_assets.number(num)
+                    };
+                    obj_index = image.render_to_objects(obj_index, (num_x, num_y), STEREO);
+                    num_y -= cell_pixels as i16;
+                }
             }
         }
 
@@ -213,11 +267,11 @@ impl Game {
         world.w().write(self.timer_text.width() - 1);
         world.h().write(20);
 
-        if self.solved {
+        if let PuzzleState::ShowingText = self.state {
             let world = vip::WORLDS.index(next_world);
             next_world -= 1;
 
-            let text_width = self.victory_text.width();
+            let text_width = self.victory_text.final_width();
             let text_height = assets::VIRTUAL_BOY.line_height as i16;
 
             world.header().write(
@@ -234,8 +288,8 @@ impl Game {
                 .write(((puzzle_bottom as i16 + 224) / 2) - text_height / 2);
             world.mx().write(0);
             world.my().write(256);
-            world.w().write(text_width);
-            world.h().write(text_height);
+            world.w().write(self.victory_text.width() - 1);
+            world.h().write(text_height - 1);
         }
 
         let world = vip::WORLDS.index(next_world);
@@ -376,9 +430,23 @@ impl Game {
     }
 
     pub fn update(&mut self, state: &GameState) -> Option<u32> {
-        if self.solved {
+        if let PuzzleState::ShowingText = self.state {
+            self.victory_text.update();
             let pressed = state.buttons_pressed();
             return (pressed.a() || pressed.sta()).then_some(self.timer);
+        }
+        if let PuzzleState::Moving = self.state {
+            let target_puzzle_left = (384 - self.puzzle.width * self.zoom.cell_pixels()) / 2;
+            let text_top = 184;
+            let target_puzzle_top = (text_top - self.puzzle.height * self.zoom.cell_pixels()) / 2;
+            if self.puzzle_pos.0 > target_puzzle_left {
+                self.puzzle_pos.0 -= 1;
+            } else if self.puzzle_pos.1 > target_puzzle_top {
+                self.puzzle_pos.1 -= 1;
+            } else {
+                self.state = PuzzleState::ShowingText;
+            }
+            return None;
         }
         self.timer += 1;
         if self.timer % 50 == 0 {
@@ -447,7 +515,7 @@ impl Game {
             self.col_numbers[self.cursor.0] = self.col_count(self.cursor.0);
             self.row_numbers[self.cursor.1] = self.row_count(self.cursor.1);
             if self.has_been_solved() {
-                self.solved = true;
+                self.state = PuzzleState::Moving;
             }
         }
         None
@@ -532,7 +600,7 @@ fn is_valid(mut cells: &[PuzzleCell], solution: &[u8]) -> bool {
     }
 }
 
-struct GameAssets(&'static [&'static Image; 56]);
+struct GameAssets(&'static [&'static Image; 57]);
 impl GameAssets {
     fn square(&self, col_bright: bool, row_bright: bool, cell: PuzzleCell) -> &'static Image {
         let index = match (col_bright, row_bright, cell) {
@@ -563,16 +631,19 @@ impl GameAssets {
     fn square_hover(&self) -> &'static Image {
         self.0[15]
     }
+    fn square_final(&self) -> &'static Image {
+        self.0[16]
+    }
 
     fn number(&self, num: u8) -> &'static Image {
-        self.0[num as usize + 15]
+        self.0[num as usize + 16]
     }
     fn number_dim(&self, num: u8) -> &'static Image {
-        self.0[num as usize + 35]
+        self.0[num as usize + 36]
     }
 }
 
-const GAME_ASSETS_1X: [&Image; 56] = [
+const GAME_ASSETS_1X: [&Image; 57] = [
     &assets::SQUARE_DD_EMPTY,
     &assets::SQUARE_DD_CROSS,
     &assets::SQUARE_DD_FULL,
@@ -589,6 +660,7 @@ const GAME_ASSETS_1X: [&Image; 56] = [
     &assets::SQUARE_BOTTOM,
     &assets::SQUARE_BOTTOM_RIGHT,
     &assets::SQUARE_HOVER,
+    &assets::SQUARE_FINAL,
     &assets::NUMBER_1,
     &assets::NUMBER_2,
     &assets::NUMBER_3,
@@ -631,7 +703,7 @@ const GAME_ASSETS_1X: [&Image; 56] = [
     &assets::NUMBER_20_DIM,
 ];
 
-const GAME_ASSETS_2X: [&Image; 56] = [
+const GAME_ASSETS_2X: [&Image; 57] = [
     &assets::SQUARE_DD_EMPTY_2X,
     &assets::SQUARE_DD_CROSS_2X,
     &assets::SQUARE_DD_FULL_2X,
@@ -648,6 +720,7 @@ const GAME_ASSETS_2X: [&Image; 56] = [
     &assets::SQUARE_BOTTOM_2X,
     &assets::SQUARE_BOTTOM_RIGHT_2X,
     &assets::SQUARE_HOVER_2X,
+    &assets::SQUARE_FINAL_2X,
     &assets::NUMBER_1_2X,
     &assets::NUMBER_2_2X,
     &assets::NUMBER_3_2X,
