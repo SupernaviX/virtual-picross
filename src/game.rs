@@ -39,7 +39,7 @@ enum PuzzleState {
     ShowingText,
 }
 
-const MAX_PUZZLE_SIZE: usize = 15;
+const MAX_PUZZLE_SIZE: usize = 20;
 
 pub struct Game {
     puzzle: &'static Puzzle,
@@ -576,26 +576,28 @@ fn is_valid(mut cells: &[PuzzleCell], solution: &[u8]) -> bool {
                 if is_valid(rest, solution) {
                     return true;
                 }
-                if full_seen {
-                    return false;
-                }
             }
             Some((PuzzleCell::Cross, rest)) => {
                 if is_valid(rest, solution) {
                     return true;
                 }
-                if full_seen {
-                    return false;
-                }
                 // optimization: if the region we're inspecting ends with a cross,
                 // there's no room for the rest
+                if full_seen {
+                    // if we saw a full cell in a region ending with a cross,
+                    // and the pattern wasn't valid, there's def no way to correct that
+                    return false;
+                }
                 continue;
             }
         }
         let (next, rest) = old_cells.split_first().unwrap();
         if matches!(next, PuzzleCell::Full) {
+            // If this region started with a full cell and we couldn't make it valid,
+            // the whole row must be invalid
             return false;
         }
+        // try filling the same pattern shifted once cell to the rust
         cells = rest;
     }
 }
