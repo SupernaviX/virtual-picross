@@ -40,6 +40,7 @@ enum PuzzleState {
 }
 
 const MAX_PUZZLE_SIZE: usize = 20;
+const TEXT_TOP: usize = 184;
 
 pub struct Game {
     puzzle: &'static Puzzle,
@@ -54,7 +55,8 @@ pub struct Game {
     state: PuzzleState,
     timer: u32,
     timer_text: TextRenderer,
-    victory_text: BufferedTextRenderer<64>,
+    name_text: BufferedTextRenderer<64>,
+    source_text: BufferedTextRenderer<64>,
 }
 
 impl Game {
@@ -71,8 +73,9 @@ impl Game {
             cursor_delay: 0,
             state: PuzzleState::Playing,
             timer: 0,
-            timer_text: TextRenderer::new(&assets::MENU, 656, (12, 2)),
-            victory_text: TextRenderer::new(&assets::VIRTUAL_BOY, 256, (24, 10)).buffered(3),
+            timer_text: TextRenderer::new(&assets::MENU, 352, (12, 2)),
+            name_text: TextRenderer::new(&assets::MENU, 256, (24, 2)).buffered(3),
+            source_text: TextRenderer::new(&assets::MENU, 304, (24, 2)).buffered(2),
         }
     }
 
@@ -112,9 +115,12 @@ impl Game {
         self.timer_text.clear();
         let _ = write!(&mut self.timer_text, "00:00:00");
         self.timer_text.render_to_bgmap(1, (0, 0));
-        self.victory_text.clear();
-        let _ = self.victory_text.draw_text(self.puzzle.name);
-        self.victory_text.render_to_bgmap(1, (0, 32));
+        self.name_text.clear();
+        let _ = self.name_text.draw_text(self.puzzle.name);
+        self.name_text.render_to_bgmap(1, (0, 32));
+        self.source_text.clear();
+        let _ = self.source_text.draw_text(self.puzzle.source);
+        self.source_text.render_to_bgmap(1, (0, 48));
     }
 
     pub fn size_cells(&self) -> (usize, usize) {
@@ -271,8 +277,8 @@ impl Game {
             let world = vip::WORLDS.index(next_world);
             next_world -= 1;
 
-            let text_width = self.victory_text.final_width();
-            let text_height = assets::VIRTUAL_BOY.line_height as i16;
+            let text_width = self.name_text.final_width();
+            let text_height = assets::MENU.line_height as i16;
 
             world.header().write(
                 vip::WorldHeader::new()
@@ -283,12 +289,31 @@ impl Game {
             );
             world.gx().write(192 - text_width / 2);
             world.gp().write(0);
-            world
-                .gy()
-                .write(((puzzle_bottom as i16 + 224) / 2) - text_height / 2);
+            world.gy().write(TEXT_TOP as i16);
             world.mx().write(0);
             world.my().write(256);
-            world.w().write(self.victory_text.width() - 1);
+            world.w().write(self.name_text.width() - 1);
+            world.h().write(text_height - 1);
+
+            let world = vip::WORLDS.index(next_world);
+            next_world -= 1;
+
+            let text_width = self.source_text.final_width();
+            let text_height = assets::MENU.line_height as i16;
+
+            world.header().write(
+                vip::WorldHeader::new()
+                    .with_bgm(vip::WorldMode::Normal)
+                    .with_lon(true)
+                    .with_ron(true)
+                    .with_bg_map_base(1),
+            );
+            world.gx().write(192 - text_width / 2);
+            world.gp().write(0);
+            world.gy().write(TEXT_TOP as i16 + text_height);
+            world.mx().write(0);
+            world.my().write(384);
+            world.w().write(self.source_text.width() - 1);
             world.h().write(text_height - 1);
         }
 
@@ -431,14 +456,15 @@ impl Game {
 
     pub fn update(&mut self, state: &GameState) -> Option<u32> {
         if let PuzzleState::ShowingText = self.state {
-            self.victory_text.update();
+            if self.name_text.update() {
+                self.source_text.update();
+            }
             let pressed = state.buttons_pressed();
             return (pressed.a() || pressed.sta()).then_some(self.timer);
         }
         if let PuzzleState::Moving = self.state {
             let target_puzzle_left = (384 - self.puzzle.width * self.zoom.cell_pixels()) / 2;
-            let text_top = 184;
-            let target_puzzle_top = (text_top - self.puzzle.height * self.zoom.cell_pixels()) / 2;
+            let target_puzzle_top = (TEXT_TOP - self.puzzle.height * self.zoom.cell_pixels()) / 2;
             if self.puzzle_pos.0 > target_puzzle_left {
                 self.puzzle_pos.0 -= 1;
             } else if self.puzzle_pos.1 > target_puzzle_top {

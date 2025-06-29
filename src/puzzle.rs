@@ -3,6 +3,7 @@ use vb_rt::sys::vip;
 
 pub struct Puzzle {
     pub name: &'static [u8],
+    pub source: &'static [u8],
     pub width: usize,
     pub height: usize,
     pub cells: &'static [u8],
@@ -101,6 +102,7 @@ const fn menu_icon_images<const N: usize>(cells: &'static [[vip::Cell; 25]; N]) 
 
 pub const EMPTY: Puzzle = Puzzle {
     name: &[],
+    source: &[],
     width: 0,
     height: 0,
     cells: &[],
@@ -117,6 +119,7 @@ const GOLF_BALL_CELLS: [u8; 5 * 5] = [
 
 pub const GOLF_BALL: Puzzle = Puzzle {
     name: b"Golf Ball",
+    source: b"Golf",
     width: 5,
     height: 5,
     cells: &GOLF_BALL_CELLS,
@@ -143,6 +146,7 @@ const BOMBERMAN_BLOCK_CELLS: [u8; 15 * 15] = [
 
 pub const BOMBERMAN_BLOCK: Puzzle = Puzzle {
     name: b"Bomberman Block",
+    source: b"Panic Bomber",
     width: 15,
     height: 15,
     cells: &BOMBERMAN_BLOCK_CELLS,
@@ -174,6 +178,7 @@ pub const HOMING_MISSILES_CELLS: [u8; 20 * 20] = [
 
 pub const HOMING_MISSILES: Puzzle = Puzzle {
     name: b"Homing Missiles",
+    source: b"Red Alarm",
     width: 20,
     height: 20,
     cells: &HOMING_MISSILES_CELLS,
