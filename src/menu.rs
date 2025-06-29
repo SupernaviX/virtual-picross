@@ -68,8 +68,11 @@ impl Menu {
         let mut obj_index = 1023;
         vip::SPT3.write(obj_index);
 
-        for index in 0..15 {
-            let (row, col) = (index / 5, index % 5);
+        let page = self.index / 15;
+
+        for index in (page * 15)..((page + 1) * 15).min(PUZZLES.len()) {
+            let index_on_page = index % 15;
+            let (row, col) = (index_on_page / 5, index_on_page % 5);
             let dst = (52 + col as i16 * 56, 8 + row as i16 * 56);
             let (menu_item, stereo) = if index == self.index {
                 (assets::MENU_ITEM_SELECTED, STEREO.with_jp(-4))
@@ -90,8 +93,8 @@ impl Menu {
                 world.gx().write(dst.0 + 8);
                 world.gp().write(if index == self.index { -4 } else { 0 });
                 world.gy().write(dst.1 + 8);
-                world.mx().write((index as i16 % 5) * 40);
-                world.my().write(256 + (index as i16 / 5) * 40);
+                world.mx().write((index_on_page as i16 % 5) * 40);
+                world.my().write(256 + (index_on_page as i16 / 5) * 40);
                 world.w().write(40);
                 world.h().write(40);
             }
@@ -197,8 +200,8 @@ impl Menu {
             self.index -= 5;
             cursor_moved = true;
         }
-        if held.ld() && self.index < PUZZLES.len() - 5 && self.cursor_delay == 0 {
-            self.index += 5;
+        if held.ld() && self.index < PUZZLES.len() - 1 && self.cursor_delay == 0 {
+            self.index = (self.index + 5).min(PUZZLES.len() - 1);
             cursor_moved = true;
         }
         if cursor_moved {

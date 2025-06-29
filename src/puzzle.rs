@@ -172,6 +172,29 @@ pub const BOMBERMAN_BLOCK: Puzzle = puzzle!(
     ---------------"
 );
 
+pub const CHALVO: Puzzle = puzzle!(
+    b"Chalvo",
+    b"Bound High",
+    (15, 15),
+    b"
+    -----xxxxx-----
+    ---xxx---xxx---
+    --x---------x--
+    -xx---------xx-
+    -xx---------xx-
+    x-xxxx---xxxx-x
+    x-xxx-x-xxx-x-x
+    x-xxx-x-xxx-x-x
+    x-x---x-x---x-x
+    x-xxxx---xxxx-x
+    -xx---------xx-
+    -xxxx-----xxxx-
+    --x--xxxxx--x--
+    --xxx-----xxx--
+    ----xxxxxxx----
+    "
+);
+
 pub const HOMING_MISSILES: Puzzle = puzzle!(
     b"Homing Missiles",
     b"Red Alarm",
@@ -199,7 +222,7 @@ pub const HOMING_MISSILES: Puzzle = puzzle!(
     ------x-----x-------"
 );
 
-pub const PUZZLES: [Puzzle; 15] = [
+pub const PUZZLES: [Puzzle; 16] = [
     GOLF_BALL,
     BOMBERMAN_BLOCK,
     HOMING_MISSILES,
@@ -215,6 +238,7 @@ pub const PUZZLES: [Puzzle; 15] = [
     EMPTY,
     EMPTY,
     EMPTY,
+    CHALVO,
 ];
 
 pub const ICON_CHARS: [vip::Character; PUZZLES.len() * 25] =

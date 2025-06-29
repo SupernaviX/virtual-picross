@@ -73,9 +73,9 @@ impl Game {
             cursor_delay: 0,
             state: PuzzleState::Playing,
             timer: 0,
-            timer_text: TextRenderer::new(&assets::MENU, 352, (12, 2)),
-            name_text: TextRenderer::new(&assets::MENU, 256, (24, 2)).buffered(3),
-            source_text: TextRenderer::new(&assets::MENU, 304, (24, 2)).buffered(2),
+            timer_text: TextRenderer::new(&assets::MENU, 400, (12, 2)),
+            name_text: TextRenderer::new(&assets::MENU, 256, (24, 3)).buffered(3),
+            source_text: TextRenderer::new(&assets::MENU, 328, (24, 3)).buffered(2),
         }
     }
 
