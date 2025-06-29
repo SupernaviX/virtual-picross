@@ -5,6 +5,7 @@ mod assets;
 mod game;
 mod menu;
 mod puzzle;
+mod save;
 mod state;
 
 use vb_graphics as gfx;
