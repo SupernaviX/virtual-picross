@@ -138,6 +138,18 @@ macro_rules! puzzle {
     }};
 }
 
+pub const TETRIS_BLOCK: Puzzle = puzzle!(
+    b"Tetris Block",
+    b"V-Tetris",
+    (5, 5),
+    b"
+    xxxxx
+    x---x
+    x-x-x
+    x---x
+    xxxxx"
+);
+
 pub const GOLF_BALL: Puzzle = puzzle!(
     b"Golf Ball",
     b"Golf",
@@ -148,6 +160,171 @@ pub const GOLF_BALL: Puzzle = puzzle!(
     xxxxx
     -xxx-
     --x--"
+);
+
+pub const HEART: Puzzle = puzzle!(
+    b"Heart",
+    b"Virtual Boy Wario Land",
+    (5, 5),
+    b"
+    -x-x-
+    xxxxx
+    xxxxx
+    -xxx-
+    --x--"
+);
+
+pub const BOWLING_PIN: Puzzle = puzzle!(
+    b"Bowling Pin",
+    b"Nestor's Funky Bowling",
+    (5, 10),
+    b"
+    --x--
+    -x-x-
+    -x-x-
+    -xxx-
+    -x-x-
+    xx-xx
+    x-x-x
+    x---x
+    -x-x-
+    -xxx-"
+);
+
+pub const VB: Puzzle = puzzle!(
+    b"VB",
+    b"Virtual Boy",
+    (10, 5),
+    b"
+    x--x-xxx--
+    x--x-x--x-
+    x--x-xxx--
+    xxxx-x--x-
+    -xx--xxx--"
+);
+
+pub const MYUU: Puzzle = puzzle!(
+    b"Myuu",
+    b"Virtual Lab",
+    (10, 10),
+    b"
+    ----------
+    ----------
+    ----------
+    -xxx--xxx-
+    xxxxxxxxxx
+    xxxxxxxxxx
+    -xxxxxxxx-
+    ---xxxx---
+    ----xx----
+    ----xx----"
+);
+
+pub const TETRIS_SQUARE: Puzzle = puzzle!(
+    b"Tetris Square",
+    b"3D Tetris",
+    (10, 10),
+    b"
+    ---xxxxxxx
+    --xx----xx
+    -x-x---x-x
+    xxxxxxx--x
+    x--x--x--x
+    x--x--x--x
+    x--xxxxxxx
+    x-x---x-x-
+    xx----xx--
+    xxxxxxx---"
+);
+
+pub const BOMBERMAN: Puzzle = puzzle!(
+    b"Bomberman",
+    b"Panic Bomber",
+    (10, 10),
+    b"
+    xx--------
+    xxxxxxxx--
+    -x------x-
+    x--xxxxx-x
+    x-x-x-x-xx
+    x-x-x-x-xx
+    x-x-----xx
+    x--xxxxx-x
+    -x------x-
+    --xxxxxx--"
+);
+
+pub const UFO: Puzzle = puzzle!(
+    b"UFO",
+    b"Galactic Pinball",
+    (10, 10),
+    b"
+    ----------
+    ----xx----
+    ---x-xx---
+    --x-xx-x--
+    -xxxx-xxx-
+    xxxxxxxxxx
+    x--xxx---x
+    -xx----xx-
+    ---xxxx---
+    ----------"
+);
+
+pub const ORB: Puzzle = puzzle!(
+    b"Orb",
+    b"Innsmouth no Yakata",
+    (10, 10),
+    b"
+    ---xxxx---
+    --xxxxxx--
+    -xx-xxxxx-
+    -x---xxxx-
+    -xx-xxxxx-
+    -xxxxxxxx-
+    --xxxxxx--
+    ---xxxx---
+    ----------
+    ---xxxx---"
+);
+
+pub const KOOPA: Puzzle = puzzle!(
+    b"Koopa",
+    b"Mario Clash",
+    (10, 10),
+    b"
+    -------xx-
+    ------x--x
+    ---xx-x-xx
+    --xxxx---x
+    -xxxxxx--x
+    -xxxxxxxx-
+    -xxxxxx-xx
+    x------x--
+    -xxxxxx---
+    xx----xx--"
+);
+
+pub const BOWLER: Puzzle = puzzle!(
+    b"Bowler",
+    b"Virtual Bowling",
+    (10, 15),
+    b"
+    x---------
+    x--xx-----
+    x-xxxx----
+    x--xx-----
+    xxxxxxxx--
+    -xxxx---xx
+    --xxxx----
+    ---xxxx---
+    ---xxxx---
+    --xxxxx---
+    --xx--xx--
+    ---x---xx-
+    ---x----xx
+    -xxx---xxx
+    xxxx------"
 );
 
 pub const BOMBERMAN_BLOCK: Puzzle = puzzle!(
@@ -195,6 +372,72 @@ pub const CHALVO: Puzzle = puzzle!(
     "
 );
 
+pub const MARIO: Puzzle = puzzle!(
+    b"Mario",
+    b"Mario Clash",
+    (15, 15),
+    b"
+    ----xxxxxxxx---
+    ----x-x--xxxx--
+    --xx--x----xxx-
+    -xx-xx------xxx
+    x-------------x
+    xx----x-------x
+    -xxxxx-x------x
+    ---x-x-xxxx--x-
+    -xx--x-x--xxxx-
+    x-----x--xxxxxx
+    x--xxx----xxxxx
+    -xxxxxx---x--xx
+    --xxxx------xxx
+    ---x----xxxx---
+    ----xxxxxxxx---"
+);
+
+pub const PAGERO: Puzzle = puzzle!(
+    b"Pagero",
+    b"Teleroboxer",
+    (15, 15),
+    b"
+    xxxx---x---xxxx
+    xxxxxxx-xxxxxxx
+    -xxxxx---xxxxx-
+    -xxxxx---xxxxx-
+    --xxxxx-xxxxx--
+    --xx--xxx--xx--
+    --x-xx-x-xx-x--
+    x-xx--x-x--xx-x
+    xxx-xx---xx-xxx
+    x-x----x----x-x
+    --xxx-xxx-xxx--
+    --xx-x---x-xx--
+    ---x-xxxxx-x---
+    ----xx---xx----
+    ------xxx------"
+);
+
+pub const WARIO: Puzzle = puzzle!(
+    b"Wario",
+    b"Virtual Boy Wario Land",
+    (15, 15),
+    b"
+    --xx-xxxxxx----
+    -xxxxxxxxxxxx--
+    xxx-xxxxx--xxx-
+    -xx---------xxx
+    -xxxxx--xxx--xx
+    x-xxxxxxxx-xxx-
+    x-x-x-x-x--xx--
+    x-x--x-x--xx-x-
+    x--xx---xxx--x-
+    -x--xx-xxxxx--x
+    x-xxxxxx-x--x-x
+    x-x-x-x--x--x-x
+    -x-xx-x---x-xx-
+    --x-xxxxxx-xxx-
+    ---x------xxx--"
+);
+
 pub const HOMING_MISSILES: Puzzle = puzzle!(
     b"Homing Missiles",
     b"Red Alarm",
@@ -222,23 +465,25 @@ pub const HOMING_MISSILES: Puzzle = puzzle!(
     ------x-----x-------"
 );
 
-pub const PUZZLES: [Puzzle; 16] = [
+pub const PUZZLES: [Puzzle; 18] = [
+    TETRIS_BLOCK,
     GOLF_BALL,
+    HEART,
+    BOWLING_PIN,
+    VB,
+    MYUU,
+    TETRIS_SQUARE,
+    BOMBERMAN,
+    UFO,
+    ORB,
+    KOOPA,
+    BOWLER,
     BOMBERMAN_BLOCK,
-    HOMING_MISSILES,
-    EMPTY,
-    EMPTY,
-    EMPTY,
-    EMPTY,
-    EMPTY,
-    EMPTY,
-    EMPTY,
-    EMPTY,
-    EMPTY,
-    EMPTY,
-    EMPTY,
-    EMPTY,
     CHALVO,
+    MARIO,
+    PAGERO,
+    WARIO,
+    HOMING_MISSILES,
 ];
 
 pub const ICON_CHARS: [vip::Character; PUZZLES.len() * 25] =

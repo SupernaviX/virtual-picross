@@ -127,7 +127,7 @@ impl Game {
         let width = self.puzzle.width
             + 1
             + self
-                .col_numbers
+                .row_numbers
                 .iter()
                 .map(|n| n.len())
                 .max()
@@ -135,7 +135,7 @@ impl Game {
         let height = self.puzzle.height
             + 1
             + self
-                .row_numbers
+                .col_numbers
                 .iter()
                 .map(|n| n.len())
                 .max()

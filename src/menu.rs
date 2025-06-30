@@ -32,12 +32,12 @@ impl Menu {
         name_renderer.render_to_bgmap(BG, (0, 4));
         let time_renderer = TextRenderer::new(&assets::MENU, 644, (20, 2));
         time_renderer.render_to_bgmap(BG, (0, 6));
-        for row in 0..3 {
-            for col in 0..5 {
-                let dst = (col * 5, (row * 5) + 32);
-                let index = (5 * row + col) as usize;
-                ICONS[index].render_to_bgmap(BG, dst);
-            }
+        for index in 0..PUZZLES.len() {
+            let row = (index / 5) as u8;
+            let col = (index % 5) as u8;
+            let dst = (col * 5, (row * 5) + 32);
+            let index = (5 * row + col) as usize;
+            ICONS[index].render_to_bgmap(BG, dst);
         }
         let mut me = Self {
             index: 0,
@@ -93,8 +93,8 @@ impl Menu {
                 world.gx().write(dst.0 + 8);
                 world.gp().write(if index == self.index { -4 } else { 0 });
                 world.gy().write(dst.1 + 8);
-                world.mx().write((index_on_page as i16 % 5) * 40);
-                world.my().write(256 + (index_on_page as i16 / 5) * 40);
+                world.mx().write((index as i16 % 5) * 40);
+                world.my().write(256 + (index as i16 / 5) * 40);
                 world.w().write(40);
                 world.h().write(40);
             }
