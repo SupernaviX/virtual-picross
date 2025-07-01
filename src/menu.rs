@@ -5,6 +5,7 @@ use vb_rt::sys::vip;
 
 use crate::{
     assets,
+    game::GameResult,
     puzzle::{ICONS, PUZZLES, Puzzle},
     save,
     state::GameState,
@@ -213,10 +214,12 @@ impl Menu {
         None
     }
 
-    pub fn finish_puzzle(&mut self, time: u32) {
-        if self.times[self.index].is_none_or(|t| t > time) {
-            self.times[self.index] = Some(time);
-            save::save_time(self.index, time);
+    pub fn finish_puzzle(&mut self, result: GameResult) {
+        if let GameResult::Won(time) = result {
+            if self.times[self.index].is_none_or(|t| t > time) {
+                self.times[self.index] = Some(time);
+                save::save_time(self.index, time);
+            }
         }
         self.display_stats();
     }

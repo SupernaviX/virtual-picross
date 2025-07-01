@@ -71,8 +71,8 @@ fn main() {
                     }
                 }
                 ActiveScreen::Game => {
-                    if let Some(time) = game.update(&state) {
-                        menu.finish_puzzle(time);
+                    if let Some(result) = game.update(&state) {
+                        menu.finish_puzzle(result);
                         transition = Some(Transition::FadeOut(31, ActiveScreen::Menu));
                     }
                 }

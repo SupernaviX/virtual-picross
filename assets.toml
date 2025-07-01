@@ -22,3 +22,7 @@ chardata = "all"
 file = "assets/menu.png"
 position = [56, 0]
 size = [56, 56]
+
+[image.pause]
+chardata = "all"
+file = "assets/pause.png"

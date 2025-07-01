@@ -1,3 +1,5 @@
+mod pause;
+
 use core::fmt::Write;
 
 use arrayvec::ArrayVec;
@@ -9,6 +11,7 @@ use vb_rt::sys::vip;
 
 use crate::{
     assets,
+    game::pause::{MenuItem, PauseMenu},
     puzzle::{EMPTY, Puzzle},
     state::GameState,
 };
@@ -33,10 +36,26 @@ impl Zoom {
     }
 }
 
+#[derive(Clone, Copy)]
 enum PuzzleState {
     Playing,
+    Paused,
     Moving,
     ShowingText,
+}
+impl PuzzleState {
+    fn numbers_visible(self) -> bool {
+        matches!(self, Self::Playing | Self::Paused)
+    }
+
+    fn grid_visible(self) -> bool {
+        matches!(self, Self::Playing | Self::Paused | Self::Moving)
+    }
+}
+
+pub enum GameResult {
+    Won(u32),
+    Quit,
 }
 
 const MAX_PUZZLE_SIZE: usize = 20;
@@ -57,6 +76,7 @@ pub struct Game {
     timer_text: TextRenderer,
     name_text: BufferedTextRenderer<64>,
     source_text: BufferedTextRenderer<64>,
+    pause_menu: PauseMenu,
 }
 
 impl Game {
@@ -76,6 +96,7 @@ impl Game {
             timer_text: TextRenderer::new(&assets::MENU, 400, (12, 2)),
             name_text: TextRenderer::new(&assets::MENU, 256, (24, 3)).buffered(3),
             source_text: TextRenderer::new(&assets::MENU, 328, (24, 3)).buffered(2),
+            pause_menu: PauseMenu::new(),
         }
     }
 
@@ -121,6 +142,7 @@ impl Game {
         self.source_text.clear();
         let _ = self.source_text.draw_text(self.puzzle.source);
         self.source_text.render_to_bgmap(1, (0, 48));
+        self.pause_menu.init();
     }
 
     pub fn size_cells(&self) -> (usize, usize) {
@@ -192,14 +214,14 @@ impl Game {
                     obj_index = image.render_to_objects(obj_index, dst, STEREO);
                 }
             }
-            if let PuzzleState::Playing | PuzzleState::Moving = self.state {
+            if self.state.grid_visible() {
                 let dst = (puzzle_right as i16, (puzzle_top + row * cell_pixels) as i16);
                 obj_index = game_assets
                     .square_right()
                     .render_to_objects(obj_index, dst, STEREO);
             }
         }
-        if let PuzzleState::Playing | PuzzleState::Moving = self.state {
+        if self.state.grid_visible() {
             for col in 0..self.puzzle.width {
                 let dst = (
                     (puzzle_left + col * cell_pixels) as i16,
@@ -216,7 +238,7 @@ impl Game {
             );
         }
 
-        if let PuzzleState::Playing = self.state {
+        if self.state.numbers_visible() {
             let cursor_x = (puzzle_left + self.cursor.0 * cell_pixels) as i16;
             let cursor_y = (puzzle_top + self.cursor.1 * cell_pixels) as i16;
             obj_index = game_assets.square_hover().render_to_objects(
@@ -315,6 +337,10 @@ impl Game {
             world.my().write(384);
             world.w().write(self.source_text.width() - 1);
             world.h().write(text_height - 1);
+        }
+
+        if let PuzzleState::Paused = self.state {
+            next_world = self.pause_menu.draw(next_world);
         }
 
         let world = vip::WORLDS.index(next_world);
@@ -454,13 +480,32 @@ impl Game {
             .all(|c| matches!(c, PuzzleCell::Empty | PuzzleCell::Cross))
     }
 
-    pub fn update(&mut self, state: &GameState) -> Option<u32> {
+    pub fn update(&mut self, state: &GameState) -> Option<GameResult> {
+        if let PuzzleState::Paused = self.state {
+            match self.pause_menu.update(state) {
+                None => {}
+                Some(MenuItem::Continue) => {
+                    self.state = PuzzleState::Playing;
+                }
+                Some(MenuItem::Restart) => {
+                    self.load_puzzle(self.puzzle);
+                    self.state = PuzzleState::Playing;
+                }
+                Some(MenuItem::Quit) => {
+                    return Some(GameResult::Quit);
+                }
+            }
+            if state.buttons_pressed().sta() {
+                self.state = PuzzleState::Playing;
+            }
+            return None;
+        }
         if let PuzzleState::ShowingText = self.state {
             if self.name_text.update() {
                 self.source_text.update();
             }
             let pressed = state.buttons_pressed();
-            return (pressed.a() || pressed.sta()).then_some(self.timer);
+            return (pressed.a() || pressed.sta()).then_some(GameResult::Won(self.timer));
         }
         if let PuzzleState::Moving = self.state {
             let target_puzzle_left = (384 - self.puzzle.width * self.zoom.cell_pixels()) / 2;
@@ -543,6 +588,10 @@ impl Game {
             if self.has_been_solved() {
                 self.state = PuzzleState::Moving;
             }
+        }
+        if pressed.sta() {
+            self.state = PuzzleState::Paused;
+            self.pause_menu.init();
         }
         None
     }
