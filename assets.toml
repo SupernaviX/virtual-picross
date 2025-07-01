@@ -26,3 +26,12 @@ size = [56, 56]
 [image.pause]
 chardata = "all"
 file = "assets/pause.png"
+
+[image.menu-arrow-right]
+chardata = "all"
+file = "assets/menu-arrow.png"
+
+[image.menu-arrow-left]
+chardata = "all"
+hflip = true
+file = "assets/menu-arrow.png"

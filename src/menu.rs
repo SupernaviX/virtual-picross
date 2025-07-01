@@ -33,6 +33,8 @@ impl Menu {
         name_renderer.render_to_bgmap(BG, (0, 4));
         let time_renderer = TextRenderer::new(&assets::MENU, 644, (20, 2));
         time_renderer.render_to_bgmap(BG, (0, 6));
+        assets::MENU_ARROW_LEFT.render_to_bgmap(BG, (32, 0));
+        assets::MENU_ARROW_RIGHT.render_to_bgmap(BG, (32, 6));
         for index in 0..PUZZLES.len() {
             let row = (index / 5) as u8;
             let col = (index % 5) as u8;
@@ -174,6 +176,42 @@ impl Menu {
             world.my().write(48);
             world.w().write(self.time_renderer.width() - 1);
             world.h().write(text_height - 1);
+        }
+
+        if page > 0 {
+            let world = vip::WORLDS.index(next_world);
+            next_world -= 1;
+            world.header().write(
+                vip::WorldHeader::new()
+                    .with_bgm(vip::WorldMode::Normal)
+                    .with_lon(true)
+                    .with_ron(true)
+                    .with_bg_map_base(BG),
+            );
+            world.gx().write(20);
+            world.gy().write(68);
+            world.mx().write(256);
+            world.my().write(0);
+            world.w().write(15);
+            world.h().write(47);
+        }
+
+        if page < PUZZLES.len() / 15 {
+            let world = vip::WORLDS.index(next_world);
+            next_world -= 1;
+            world.header().write(
+                vip::WorldHeader::new()
+                    .with_bgm(vip::WorldMode::Normal)
+                    .with_lon(true)
+                    .with_ron(true)
+                    .with_bg_map_base(BG),
+            );
+            world.gx().write(348);
+            world.gy().write(68);
+            world.mx().write(256);
+            world.my().write(48);
+            world.w().write(15);
+            world.h().write(47);
         }
 
         let world = vip::WORLDS.index(next_world);
