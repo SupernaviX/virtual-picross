@@ -25,13 +25,13 @@ pub struct Menu {
 
 impl Menu {
     pub fn new() -> Self {
-        let index_renderer = TextRenderer::new(&assets::MENU, 512, (12, 2));
+        let index_renderer = TextRenderer::new(&assets::MENU, 612, (12, 2));
         index_renderer.render_to_bgmap(BG, (0, 0));
-        let size_renderer = TextRenderer::new(&assets::MENU, 536, (12, 2));
+        let size_renderer = TextRenderer::new(&assets::MENU, 636, (12, 2));
         size_renderer.render_to_bgmap(BG, (0, 2));
-        let name_renderer = TextRenderer::new(&assets::MENU, 560, (28, 3));
+        let name_renderer = TextRenderer::new(&assets::MENU, 660, (28, 3));
         name_renderer.render_to_bgmap(BG, (0, 4));
-        let time_renderer = TextRenderer::new(&assets::MENU, 644, (20, 2));
+        let time_renderer = TextRenderer::new(&assets::MENU, 744, (20, 2));
         time_renderer.render_to_bgmap(BG, (0, 6));
         assets::MENU_ARROW_LEFT.render_to_bgmap(BG, (32, 0));
         assets::MENU_ARROW_RIGHT.render_to_bgmap(BG, (32, 6));

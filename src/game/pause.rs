@@ -39,13 +39,13 @@ impl PauseMenu {
 
         let active = MenuItem::Continue;
 
-        let mut continue_text = TextRenderer::new(&assets::MENU, 684, (12, 2));
+        let mut continue_text = TextRenderer::new(&assets::MENU, 784, (12, 2));
         continue_text.draw_text(b"Continue");
         continue_text.render_to_bgmap(3, (0, 32));
-        let mut restart_text = TextRenderer::new(&assets::MENU, 708, (12, 2));
+        let mut restart_text = TextRenderer::new(&assets::MENU, 808, (12, 2));
         restart_text.draw_text(b"Restart");
         restart_text.render_to_bgmap(3, (0, 34));
-        let mut quit_text = TextRenderer::new(&assets::MENU, 732, (12, 2));
+        let mut quit_text = TextRenderer::new(&assets::MENU, 832, (12, 2));
         quit_text.draw_text(b"Quit");
         quit_text.render_to_bgmap(3, (0, 36));
 

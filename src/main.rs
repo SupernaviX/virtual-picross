@@ -7,10 +7,11 @@ mod menu;
 mod puzzle;
 mod save;
 mod state;
+mod title;
 
 use vb_graphics as gfx;
 
-use crate::{game::Game, menu::Menu, state::GameState};
+use crate::{game::Game, menu::Menu, state::GameState, title::Title};
 
 vb_rt::rom_header!("Virtual Picross", "SG", "VPIC");
 vb_rt::main!({ main() });
@@ -29,16 +30,18 @@ fn main() {
 
     let mut state = GameState::new();
 
+    let mut title = Title::new();
     let mut menu = Menu::new();
     let mut game = Game::new();
 
-    let mut active = ActiveScreen::Menu;
+    let mut active = ActiveScreen::Title;
     let mut transition = Some(Transition::FadeIn(0));
 
     FRAME.enable_interrupts();
 
     loop {
         match active {
+            ActiveScreen::Title => title.draw(),
             ActiveScreen::Menu => menu.draw(),
             ActiveScreen::Game => game.draw(),
         };
@@ -64,6 +67,11 @@ fn main() {
                 }
             }
             None => match active {
+                ActiveScreen::Title => {
+                    if title.update(&state) {
+                        transition = Some(Transition::FadeOut(31, ActiveScreen::Menu));
+                    }
+                }
                 ActiveScreen::Menu => {
                     if let Some(puzzle) = menu.update(&state) {
                         game.load_puzzle(puzzle);
@@ -83,6 +91,7 @@ fn main() {
 
 #[derive(Clone, Copy)]
 enum ActiveScreen {
+    Title,
     Menu,
     Game,
 }

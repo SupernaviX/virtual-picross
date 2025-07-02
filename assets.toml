@@ -35,3 +35,19 @@ file = "assets/menu-arrow.png"
 chardata = "all"
 hflip = true
 file = "assets/menu-arrow.png"
+
+[image.title-left]
+chardata = "all"
+file = "assets/title.png"
+position = [0, 0]
+size = [384, 224]
+
+[image.title-right]
+chardata = "all"
+file = "assets/title.png"
+position = [0, 224]
+size = [384, 224]
+
+[image.start]
+chardata = "all"
+file = "assets/start.png"
