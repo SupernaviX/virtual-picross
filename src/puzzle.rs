@@ -349,6 +349,28 @@ pub const BOMBERMAN_BLOCK: Puzzle = puzzle!(
     ---------------"
 );
 
+pub const JACK_SKELTON: Puzzle = puzzle!(
+    b"Jack Skelton",
+    b"Jack Bros.",
+    (15, 15),
+    b"
+    ----xxx-xxx----
+    ----xxxxxxx----
+    ---xxxx--xxx---
+    ---xxxxx--xx---
+    -xxxxxxx--xxxx-
+    x--xxxxxxxxx--x
+    x---xxxxxx----x
+    -xxx-------xxx-
+    --x-xxxxxxx-x--
+    --x--xx-xx--x--
+    --x----x----x--
+    --x-x-x-x-x-x--
+    ---x-xxxxx-x---
+    ----x--x--x----
+    -----xx-xx-----"
+);
+
 pub const CHALVO: Puzzle = puzzle!(
     b"Chalvo",
     b"Bound High",
@@ -465,7 +487,7 @@ pub const HOMING_MISSILES: Puzzle = puzzle!(
     ------x-----x-------"
 );
 
-pub const PUZZLES: [Puzzle; 18] = [
+pub const PUZZLES: [Puzzle; 19] = [
     TETRIS_BLOCK,
     GOLF_BALL,
     HEART,
@@ -479,6 +501,7 @@ pub const PUZZLES: [Puzzle; 18] = [
     KOOPA,
     BOWLER,
     BOMBERMAN_BLOCK,
+    JACK_SKELTON,
     CHALVO,
     MARIO,
     PAGERO,
