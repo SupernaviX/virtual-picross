@@ -600,6 +600,7 @@ impl Game {
             self.row_numbers[self.cursor.1] = self.row_count(self.cursor.1);
             if self.has_been_solved() {
                 self.state = PuzzleState::Moving;
+                self.megu.win();
             }
         }
         if pressed.sta() {

@@ -1,31 +1,114 @@
+# Idle pose
+
 [image.megu-idle-back-l]
 chardata = "all"
 file = "megu.png"
-position = [0, 0]
-size = [48, 56]
+position = [0, 16]
+size = [64, 56]
 
 [image.megu-idle-back-r]
 chardata = "all"
 file = "megu.png"
 hflip = true
-position = [0, 0]
-size = [48, 56]
+position = [0, 16]
+size = [64, 56]
 
 [image.megu-idle-mid-l]
 chardata = "all"
 file = "megu.png"
-position = [48, 0]
-size = [32, 80]
+position = [64, 0]
+size = [64, 80]
 
 [image.megu-idle-mid-r]
 chardata = "all"
 file = "megu.png"
 hflip = true
-position = [48, 0]
-size = [32, 80]
+position = [64, 0]
+size = [64, 80]
 
 [image.megu-idle-front]
 chardata = "all"
 file = "megu.png"
-position = [80, 0]
-size = [32, 16]
+position = [128, 16]
+size = [64, 24]
+
+# Celebration 1
+
+[image.megu-celebrate-1-back-l]
+chardata = "all"
+file = "megu.png"
+position = [0, 96]
+size = [64, 40]
+
+[image.megu-celebrate-1-back-r]
+chardata = "all"
+file = "megu.png"
+hflip = true
+position = [0, 96]
+size = [64, 40]
+
+[image.megu-celebrate-1-mid-l]
+chardata = "all"
+file = "megu.png"
+position = [64, 80]
+size = [64, 80]
+
+[image.megu-celebrate-1-mid-r]
+chardata = "all"
+file = "megu.png"
+hflip = true
+position = [64, 80]
+size = [64, 80]
+
+[image.megu-celebrate-1-front-l]
+chardata = "all"
+file = "megu.png"
+position = [128, 96]
+size = [64, 48]
+
+[image.megu-celebrate-1-front-r]
+chardata = "all"
+file = "megu.png"
+hflip = true
+position = [128, 96]
+size = [64, 48]
+
+# Celebration 2
+
+[image.megu-celebrate-2-back-l]
+chardata = "all"
+file = "megu.png"
+position = [0, 176]
+size = [64, 56]
+
+[image.megu-celebrate-2-back-r]
+chardata = "all"
+file = "megu.png"
+hflip = true
+position = [0, 176]
+size = [64, 56]
+
+[image.megu-celebrate-2-mid-l]
+chardata = "all"
+file = "megu.png"
+position = [64, 160]
+size = [64, 80]
+
+[image.megu-celebrate-2-mid-r]
+chardata = "all"
+file = "megu.png"
+position = [64, 240]
+size = [64, 80]
+
+[image.megu-celebrate-2-front-l]
+chardata = "all"
+file = "megu.png"
+position = [128, 176]
+size = [64, 64]
+
+[image.megu-celebrate-2-front-r]
+chardata = "all"
+file = "megu.png"
+hflip = true
+position = [128, 176]
+size = [64, 64]
