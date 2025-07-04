@@ -1,6 +1,7 @@
 imports = [
     "assets/assets-1x.toml",
     "assets/assets-2x.toml",
+    "assets/assets-megu.toml"
 ]
 
 [font.virtual-boy]

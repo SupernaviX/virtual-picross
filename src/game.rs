@@ -1,3 +1,4 @@
+mod megu;
 mod pause;
 
 use core::fmt::Write;
@@ -11,7 +12,10 @@ use vb_rt::sys::vip;
 
 use crate::{
     assets,
-    game::pause::{MenuItem, PauseMenu},
+    game::{
+        megu::Megu,
+        pause::{MenuItem, PauseMenu},
+    },
     puzzle::{EMPTY, Puzzle},
     state::GameState,
 };
@@ -77,6 +81,7 @@ pub struct Game {
     name_text: BufferedTextRenderer<64>,
     source_text: BufferedTextRenderer<64>,
     pause_menu: PauseMenu,
+    megu: Megu,
 }
 
 impl Game {
@@ -97,6 +102,7 @@ impl Game {
             name_text: TextRenderer::new(&assets::MENU, 856, (24, 3)).buffered(3),
             source_text: TextRenderer::new(&assets::MENU, 928, (24, 3)).buffered(2),
             pause_menu: PauseMenu::new(),
+            megu: Megu::new(),
         }
     }
 
@@ -143,6 +149,10 @@ impl Game {
         let _ = self.source_text.draw_text(self.puzzle.source);
         self.source_text.render_to_bgmap(1, (0, 48));
         self.pause_menu.init();
+
+        let megu_mid_x = (puzzle_right as i16 + 384) / 2;
+        let megu_mid_y = (puzzle_top as i16 + puzzle_bottom as i16) / 2;
+        self.megu.init((megu_mid_x, megu_mid_y));
     }
 
     pub fn size_cells(&self) -> (usize, usize) {
@@ -343,6 +353,8 @@ impl Game {
             next_world = self.pause_menu.draw(next_world);
         }
 
+        next_world = self.megu.draw(next_world);
+
         let world = vip::WORLDS.index(next_world);
         world.header().write(vip::WorldHeader::new().with_end(true));
     }
@@ -480,7 +492,8 @@ impl Game {
             .all(|c| matches!(c, PuzzleCell::Empty | PuzzleCell::Cross))
     }
 
-    pub fn update(&mut self, state: &GameState) -> Option<GameResult> {
+    pub fn update(&mut self, state: &mut GameState) -> Option<GameResult> {
+        self.megu.update(state);
         if let PuzzleState::Paused = self.state {
             match self.pause_menu.update(state) {
                 None => {}

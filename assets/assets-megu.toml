@@ -1,0 +1,31 @@
+[image.megu-idle-back-l]
+chardata = "all"
+file = "megu.png"
+position = [0, 0]
+size = [48, 56]
+
+[image.megu-idle-back-r]
+chardata = "all"
+file = "megu.png"
+hflip = true
+position = [0, 0]
+size = [48, 56]
+
+[image.megu-idle-mid-l]
+chardata = "all"
+file = "megu.png"
+position = [48, 0]
+size = [32, 80]
+
+[image.megu-idle-mid-r]
+chardata = "all"
+file = "megu.png"
+hflip = true
+position = [48, 0]
+size = [32, 80]
+
+[image.megu-idle-front]
+chardata = "all"
+file = "megu.png"
+position = [80, 0]
+size = [32, 16]

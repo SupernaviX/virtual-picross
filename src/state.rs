@@ -1,3 +1,5 @@
+use rand::{Rng, SeedableRng};
+use rand_xoshiro::Xoroshiro128PlusPlus;
 use vb_rt::sys::hardware;
 
 const DPAD_OFFSETS: [u16; 4] = [8, 9, 10, 11];
@@ -6,6 +8,7 @@ pub struct GameState {
     curr_pressed: hardware::GamePadData,
     prev_pressed: hardware::GamePadData,
     curr_held: [u32; DPAD_OFFSETS.len()],
+    rand: Xoroshiro128PlusPlus,
 }
 
 impl GameState {
@@ -14,6 +17,7 @@ impl GameState {
             curr_pressed: hardware::GamePadData::new(),
             prev_pressed: hardware::GamePadData::new(),
             curr_held: [0; DPAD_OFFSETS.len()],
+            rand: Xoroshiro128PlusPlus::seed_from_u64(0),
         }
     }
 
@@ -42,6 +46,9 @@ impl GameState {
         let pressed = hardware::read_controller();
         self.prev_pressed = self.curr_pressed;
         self.curr_pressed = pressed;
+        if self.prev_pressed.into_bits() != self.curr_pressed.into_bits() {
+            let _: u32 = self.rand.random();
+        }
 
         let raw_bits = pressed.into_bits();
         for (counter, button_offset) in self.curr_held.iter_mut().zip(DPAD_OFFSETS) {
@@ -52,5 +59,9 @@ impl GameState {
                 *counter = 0;
             }
         }
+    }
+
+    pub fn rand(&mut self) -> &mut impl Rng {
+        &mut self.rand
     }
 }
