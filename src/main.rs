@@ -10,6 +10,7 @@ mod state;
 mod title;
 
 use vb_graphics as gfx;
+use vb_rt::sys::vip::Character;
 
 use crate::{game::Game, menu::Menu, state::GameState, title::Title};
 
@@ -25,7 +26,9 @@ fn main() {
     gfx::init_display();
     gfx::set_colors(32, 64, 32);
     gfx::set_bkcol(0);
-    gfx::load_character_data(&assets::ALL, 0);
+
+    let mut loaded_chardata: &[Character] = &assets::TITLE;
+    gfx::load_character_data(loaded_chardata, 0);
     gfx::load_character_data(&puzzle::ICON_CHARS, puzzle::ICON_CHAR_OFFSET);
 
     let mut state = GameState::new();
@@ -62,6 +65,14 @@ fn main() {
                 *amount -= 1;
                 gfx::set_colors(*amount, *amount * 2, *amount);
                 if *amount == 0 {
+                    let chardata: &[Character] = match next {
+                        ActiveScreen::Title => &assets::TITLE,
+                        _ => &assets::ALL,
+                    };
+                    if !core::ptr::addr_eq(loaded_chardata, chardata) {
+                        loaded_chardata = chardata;
+                        gfx::load_character_data(loaded_chardata, 0);
+                    }
                     active = *next;
                     transition = Some(Transition::FadeIn(0));
                 }
