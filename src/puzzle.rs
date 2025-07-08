@@ -371,6 +371,28 @@ pub const JACK_SKELTON: Puzzle = puzzle!(
     -----xx-xx-----"
 );
 
+pub const YOSHI: Puzzle = puzzle!(
+    b"Yoshi",
+    b"Mario's Tennis",
+    (15, 15),
+    b"
+    xxx-xxx-xx-xxxx
+    x--x---x--x---x
+    x--x-xx-xxx---x
+    x--x-xx-xxx---x
+    x-x-x-xxxxxx--x
+    x-x--x------x-x
+    -x--x----x-x-x-
+    x-------------x
+    x--xx---------x
+    x---x---------x
+    -xx--x-------x-
+    x-xx--xxxxxxx-x
+    x--xx-----xx--x
+    x---xxxxxxx---x
+    xxxx-------xxxx"
+);
+
 pub const CHALVO: Puzzle = puzzle!(
     b"Chalvo",
     b"Bound High",
@@ -390,8 +412,7 @@ pub const CHALVO: Puzzle = puzzle!(
     -xxxx-----xxxx-
     --x--xxxxx--x--
     --xxx-----xxx--
-    ----xxxxxxx----
-    "
+    ----xxxxxxx----"
 );
 
 pub const MARIO: Puzzle = puzzle!(
@@ -487,7 +508,7 @@ pub const HOMING_MISSILES: Puzzle = puzzle!(
     ------x-----x-------"
 );
 
-pub const PUZZLES: [Puzzle; 19] = [
+pub const PUZZLES: [Puzzle; 20] = [
     TETRIS_BLOCK,
     GOLF_BALL,
     HEART,
@@ -502,6 +523,7 @@ pub const PUZZLES: [Puzzle; 19] = [
     BOWLER,
     BOMBERMAN_BLOCK,
     JACK_SKELTON,
+    YOSHI,
     CHALVO,
     MARIO,
     PAGERO,
