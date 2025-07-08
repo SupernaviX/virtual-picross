@@ -305,6 +305,23 @@ pub const KOOPA: Puzzle = puzzle!(
     xx----xx--"
 );
 
+pub const ZAKU_II: Puzzle = puzzle!(
+    b"MS-06 Zaku II",
+    b"SD Gundam Dimension War",
+    (15, 10),
+    b"
+    -----xxxxx-----
+    ---xxxxxxxxx---
+    --xxxxxxxxxxx--
+    --xxxxxxxxxxxx-
+    -xx-xxxxxxxx-x-
+    -xx-x----xx--xx
+    xx--x---xxxx--x
+    xxxxx----xx--xx
+    xxxxxxxxx--xxxx
+    --xxxxxxxxxxxx-"
+);
+
 pub const BOWLER: Puzzle = puzzle!(
     b"Bowler",
     b"Virtual Bowling",
@@ -508,7 +525,7 @@ pub const HOMING_MISSILES: Puzzle = puzzle!(
     ------x-----x-------"
 );
 
-pub const PUZZLES: [Puzzle; 20] = [
+pub const PUZZLES: [Puzzle; 21] = [
     TETRIS_BLOCK,
     GOLF_BALL,
     HEART,
@@ -520,6 +537,7 @@ pub const PUZZLES: [Puzzle; 20] = [
     UFO,
     ORB,
     KOOPA,
+    ZAKU_II,
     BOWLER,
     BOMBERMAN_BLOCK,
     JACK_SKELTON,
