@@ -99,8 +99,8 @@ impl Game {
             state: PuzzleState::Playing,
             timer: 0,
             timer_text: TextRenderer::new(&assets::MENU, 512, (12, 2)),
-            name_text: TextRenderer::new(&assets::MENU, 856, (26, 3)).buffered(3),
-            source_text: TextRenderer::new(&assets::MENU, 934, (30, 3)).buffered(2),
+            name_text: TextRenderer::new(&assets::MENU, 536, (26, 3)).buffered(3),
+            source_text: TextRenderer::new(&assets::MENU, 614, (48, 3)).buffered(2),
             pause_menu: PauseMenu::new(),
             megu: Megu::new(),
         }
@@ -117,7 +117,9 @@ impl Game {
         self.col_numbers = (0..self.puzzle.width)
             .map(|col| self.col_count(col))
             .collect();
+    }
 
+    pub fn init(&mut self) {
         let (width_cells, height_cells) = self.size_cells();
         self.zoom = if width_cells >= 24 || height_cells >= 14 {
             Zoom::One
@@ -502,6 +504,7 @@ impl Game {
                 }
                 Some(MenuItem::Restart) => {
                     self.load_puzzle(self.puzzle);
+                    self.init();
                     self.state = PuzzleState::Playing;
                 }
                 Some(MenuItem::Quit) => {

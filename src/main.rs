@@ -73,6 +73,11 @@ fn main() {
                         loaded_chardata = chardata;
                         gfx::load_character_data(loaded_chardata, 0);
                     }
+                    match next {
+                        ActiveScreen::Game => game.init(),
+                        ActiveScreen::Menu => menu.init(),
+                        _ => {}
+                    }
                     active = *next;
                     transition = Some(Transition::FadeIn(0));
                 }

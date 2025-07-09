@@ -25,14 +25,14 @@ pub struct Menu {
 
 impl Menu {
     pub fn new() -> Self {
-        let index_renderer = TextRenderer::new(&assets::MENU, 612, (12, 2));
+        let index_renderer = TextRenderer::new(&assets::MENU, 512, (12, 2));
         index_renderer.render_to_bgmap(BG, (0, 0));
-        let size_renderer = TextRenderer::new(&assets::MENU, 636, (12, 2));
-        size_renderer.render_to_bgmap(BG, (0, 2));
-        let name_renderer = TextRenderer::new(&assets::MENU, 660, (28, 3));
-        name_renderer.render_to_bgmap(BG, (0, 4));
-        let time_renderer = TextRenderer::new(&assets::MENU, 744, (20, 2));
-        time_renderer.render_to_bgmap(BG, (0, 6));
+        let size_renderer = TextRenderer::new(&assets::MENU, 536, (12, 3));
+        size_renderer.render_to_bgmap(BG, (0, 3));
+        let name_renderer = TextRenderer::new(&assets::MENU, 572, (28, 3));
+        name_renderer.render_to_bgmap(BG, (0, 6));
+        let time_renderer = TextRenderer::new(&assets::MENU, 656, (20, 2));
+        time_renderer.render_to_bgmap(BG, (0, 9));
         assets::MENU_ARROW_LEFT.render_to_bgmap(BG, (32, 0));
         assets::MENU_ARROW_RIGHT.render_to_bgmap(BG, (32, 6));
         for index in 0..PUZZLES.len() {
@@ -138,7 +138,7 @@ impl Menu {
             world.gx().write(8);
             world.gy().write(184 + text_height);
             world.mx().write(0);
-            world.my().write(16);
+            world.my().write(24);
             world.w().write(self.size_renderer.width() - 1);
             world.h().write(text_height - 1);
         }
@@ -155,7 +155,7 @@ impl Menu {
             world.gx().write(104);
             world.gy().write(184);
             world.mx().write(0);
-            world.my().write(32);
+            world.my().write(48);
             world.w().write(self.name_renderer.width() - 1);
             world.h().write(text_height - 1);
         }
@@ -173,7 +173,7 @@ impl Menu {
             world.gx().write(104);
             world.gy().write(184 + text_height);
             world.mx().write(0);
-            world.my().write(48);
+            world.my().write(72);
             world.w().write(self.time_renderer.width() - 1);
             world.h().write(text_height - 1);
         }
@@ -259,6 +259,9 @@ impl Menu {
                 save::save_time(self.index, time);
             }
         }
+    }
+
+    pub fn init(&mut self) {
         self.display_stats();
     }
 
