@@ -322,6 +322,23 @@ pub const ZAKU_II: Puzzle = puzzle!(
     --xxxxxxxxxxxx-"
 );
 
+pub const MEDIUM_INVADER: Puzzle = puzzle!(
+    b"Medium Invader",
+    b"Space Invaders Virtual Collection",
+    (15, 10),
+    b"
+    ---------------
+    ----x-----x----
+    -----x---x-----
+    ----xxxxxxx----
+    ---xx-xxx-xx---
+    --xxxxxxxxxxx--
+    --x-xxxxxxx-x--
+    --x-x-----x-x--
+    -----xx-xx-----
+    ---------------"
+);
+
 pub const BOWLER: Puzzle = puzzle!(
     b"Bowler",
     b"Virtual Bowling",
@@ -525,7 +542,7 @@ pub const HOMING_MISSILES: Puzzle = puzzle!(
     ------x-----x-------"
 );
 
-pub const PUZZLES: [Puzzle; 21] = [
+pub const PUZZLES: [Puzzle; 22] = [
     TETRIS_BLOCK,
     GOLF_BALL,
     HEART,
@@ -538,6 +555,7 @@ pub const PUZZLES: [Puzzle; 21] = [
     ORB,
     KOOPA,
     ZAKU_II,
+    MEDIUM_INVADER,
     BOWLER,
     BOMBERMAN_BLOCK,
     JACK_SKELTON,
