@@ -427,6 +427,28 @@ pub const YOSHI: Puzzle = puzzle!(
     xxxx-------xxxx"
 );
 
+pub const P_TRON: Puzzle = puzzle!(
+    b"P-Tron",
+    b"Space Squash",
+    (15, 15),
+    b"
+    xxxxxxx-xxxxxxx
+    xxxxxx---xxxxxx
+    x--xx--x--xx--x
+    xx---xxxxx---xx
+    xxx-x-xxx-x-xxx
+    xx-x-x-x-x-x-xx
+    x--x--xxx--x--x
+    x-x-xxxxxxx-x-x
+    -xx---xxx---xx-
+    -xxx-x---x-xxx-
+    --xx--xxx--xx--
+    ---xx--x--xx---
+    ---x--x-x--x---
+    xxx---xxx---xxx
+    xx---xxxxx---xx"
+);
+
 pub const CHALVO: Puzzle = puzzle!(
     b"Chalvo",
     b"Bound High",
@@ -542,7 +564,7 @@ pub const HOMING_MISSILES: Puzzle = puzzle!(
     ------x-----x-------"
 );
 
-pub const PUZZLES: [Puzzle; 22] = [
+pub const PUZZLES: [Puzzle; 23] = [
     TETRIS_BLOCK,
     GOLF_BALL,
     HEART,
@@ -560,6 +582,7 @@ pub const PUZZLES: [Puzzle; 22] = [
     BOMBERMAN_BLOCK,
     JACK_SKELTON,
     YOSHI,
+    P_TRON,
     CHALVO,
     MARIO,
     PAGERO,
