@@ -176,7 +176,7 @@ pub const HEART: Puzzle = puzzle!(
 
 pub const BOWLING_PIN: Puzzle = puzzle!(
     b"Bowling Pin",
-    b"Nestor's Funky Bowling",
+    b"Nester's Funky Bowling",
     (5, 10),
     b"
     --x--
