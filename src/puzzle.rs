@@ -405,6 +405,28 @@ pub const JACK_SKELTON: Puzzle = puzzle!(
     -----xx-xx-----"
 );
 
+pub const REPAIR_DRONE: Puzzle = puzzle!(
+    b"Repair Drone",
+    b"Vertical Force",
+    (15, 15),
+    b"
+    ------xxx------
+    -----xxxxx-----
+    ----xx-x-xx----
+    ---xx-x-x-xx---
+    ---x-x---x-x---
+    --x-xx-x-xx-x--
+    --x-x-xxx-x-x--
+    --x-x-xxx-x-x--
+    --x-x--x--x-x--
+    ---x-xx-xx-x---
+    ----x--x--x----
+    -x--x-x-x-x--x-
+    xxx-xx-x-xx-xxx
+    xxxxxxxxxxxxxxx
+    x-x--x---x--x-x"
+);
+
 pub const YOSHI: Puzzle = puzzle!(
     b"Yoshi",
     b"Mario's Tennis",
@@ -564,7 +586,7 @@ pub const HOMING_MISSILES: Puzzle = puzzle!(
     ------x-----x-------"
 );
 
-pub const PUZZLES: [Puzzle; 23] = [
+pub const PUZZLES: [Puzzle; 24] = [
     TETRIS_BLOCK,
     GOLF_BALL,
     HEART,
@@ -581,6 +603,7 @@ pub const PUZZLES: [Puzzle; 23] = [
     BOWLER,
     BOMBERMAN_BLOCK,
     JACK_SKELTON,
+    REPAIR_DRONE,
     YOSHI,
     P_TRON,
     CHALVO,
