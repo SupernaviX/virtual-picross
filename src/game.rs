@@ -581,15 +581,15 @@ impl Game {
         let index = self.cursor.1 * self.puzzle.width + self.cursor.0;
         if pressed.b() {
             let new_cell = match self.cells[index] {
-                PuzzleCell::Cross => PuzzleCell::Empty,
-                _ => PuzzleCell::Cross,
+                PuzzleCell::Empty => PuzzleCell::Cross,
+                _ => PuzzleCell::Empty,
             };
             self.cursor_behavior = Some(new_cell);
         }
         if pressed.a() {
             let new_cell = match self.cells[index] {
-                PuzzleCell::Full => PuzzleCell::Empty,
-                _ => PuzzleCell::Full,
+                PuzzleCell::Empty => PuzzleCell::Full,
+                _ => PuzzleCell::Empty,
             };
             self.cursor_behavior = Some(new_cell);
         }
@@ -598,12 +598,16 @@ impl Game {
             self.cursor_behavior = None;
         }
         if let Some(behavior) = self.cursor_behavior {
-            self.cells[index] = behavior;
-            self.col_numbers[self.cursor.0] = self.col_count(self.cursor.0);
-            self.row_numbers[self.cursor.1] = self.row_count(self.cursor.1);
-            if self.has_been_solved() {
-                self.state = PuzzleState::Moving;
-                self.megu.win();
+            if matches!(behavior, PuzzleCell::Empty)
+                || matches!(self.cells[index], PuzzleCell::Empty)
+            {
+                self.cells[index] = behavior;
+                self.col_numbers[self.cursor.0] = self.col_count(self.cursor.0);
+                self.row_numbers[self.cursor.1] = self.row_count(self.cursor.1);
+                if self.has_been_solved() {
+                    self.state = PuzzleState::Moving;
+                    self.megu.win();
+                }
             }
         }
         if pressed.sta() {
