@@ -339,6 +339,23 @@ pub const MEDIUM_INVADER: Puzzle = puzzle!(
     ---------------"
 );
 
+pub const LURE: Puzzle = puzzle!(
+    b"Lure",
+    b"Virtual Fishing",
+    (15, 10),
+    b"
+    ------xxxx-----
+    --xxxx----xxxxx
+    -xx-----xxxxxx-
+    x--x---xxxx---x
+    xx--xxxxxx--x-x
+    xxxxxxxxx-x-xx-
+    -xxx--x---x--xx
+    ----xx--x-x-x--
+    ---xx----xxx---
+    --xx-----------"
+);
+
 pub const BOWLER: Puzzle = puzzle!(
     b"Bowler",
     b"Virtual Bowling",
@@ -586,7 +603,7 @@ pub const HOMING_MISSILES: Puzzle = puzzle!(
     ------x-----x-------"
 );
 
-pub const PUZZLES: [Puzzle; 24] = [
+pub const PUZZLES: [Puzzle; 25] = [
     TETRIS_BLOCK,
     GOLF_BALL,
     HEART,
@@ -600,6 +617,7 @@ pub const PUZZLES: [Puzzle; 24] = [
     KOOPA,
     ZAKU_II,
     MEDIUM_INVADER,
+    LURE,
     BOWLER,
     BOMBERMAN_BLOCK,
     JACK_SKELTON,
