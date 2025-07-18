@@ -45,6 +45,7 @@ enum PuzzleState {
     Playing,
     Paused,
     Moving,
+    RevealingRow(usize),
     ShowingText,
 }
 impl PuzzleState {
@@ -203,10 +204,15 @@ impl Game {
         let puzzle_bottom = puzzle_top + (self.puzzle.height * cell_pixels);
 
         for row in 0..self.puzzle.height {
+            let revealed = match self.state {
+                PuzzleState::ShowingText => true,
+                PuzzleState::RevealingRow(revealed) => row <= (revealed / 2),
+                _ => false,
+            };
             for col in 0..self.puzzle.width {
                 let col_bright = col > 0 && col % 5 == 0;
                 let row_bright = row > 0 && row % 5 == 0;
-                if let PuzzleState::ShowingText = self.state {
+                if revealed {
                     let answer = self.puzzle.cells[row * self.puzzle.width + col];
                     if answer == 1 {
                         let image = game_assets.square_final();
@@ -523,6 +529,14 @@ impl Game {
             let pressed = state.buttons_pressed();
             return (pressed.a() || pressed.sta()).then_some(GameResult::Won(self.timer));
         }
+        if let PuzzleState::RevealingRow(revealed) = self.state {
+            if revealed == self.puzzle.height * 2 {
+                self.state = PuzzleState::ShowingText;
+            } else {
+                self.state = PuzzleState::RevealingRow(revealed + 1);
+            }
+            return None;
+        }
         if let PuzzleState::Moving = self.state {
             let target_puzzle_left = (384 - self.puzzle.width * self.zoom.cell_pixels()) / 2;
             let target_puzzle_top = (TEXT_TOP - self.puzzle.height * self.zoom.cell_pixels()) / 2;
@@ -531,7 +545,7 @@ impl Game {
             } else if self.puzzle_pos.1 > target_puzzle_top {
                 self.puzzle_pos.1 -= 1;
             } else {
-                self.state = PuzzleState::ShowingText;
+                self.state = PuzzleState::RevealingRow(0);
             }
             return None;
         }
