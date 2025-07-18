@@ -131,7 +131,7 @@ impl Game {
         let y_offset = (224 - height_cells * cell_pixels) / 2;
 
         let puzzle_right = 384 - cell_pixels - x_offset;
-        let puzzle_bottom = 224 - cell_pixels - y_offset;
+        let puzzle_bottom = 224 - y_offset;
         let puzzle_left = puzzle_right - (self.puzzle.width * cell_pixels);
         let puzzle_top = puzzle_bottom - (self.puzzle.height * cell_pixels);
         self.puzzle_pos = (puzzle_left, puzzle_top);
