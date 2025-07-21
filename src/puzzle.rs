@@ -615,6 +615,28 @@ pub const WARIO: Puzzle = puzzle!(
     ---x------xxx--"
 );
 
+pub const MASK_GUY: Puzzle = puzzle!(
+    b"Mask Guy",
+    b"Virtual Boy Wario Land",
+    (20, 15),
+    b"
+    ----xxxxxxxx--------
+    --xxx-x----xx-------
+    -xxxx--x--x-x-------
+    xxxxx---xx--x-------
+    xxxxx--x--x-x-------
+    xxxxxx-x--x-x-xxx---
+    xx--x-x-xx--x-xxxxx-
+    x--xx--xxxxxxxxxxxxx
+    x---x--xxxxxxxxxxxx-
+    x--xx---xx--x-xxx---
+    xxxxx-x-x-x-x-------
+    -xxxxx-x-x-xx-------
+    x--xx-x-x-x-x-------
+    -xx-xx-xxx-x--------
+    ---xx----xxx--------"
+);
+
 pub const HOMING_MISSILES: Puzzle = puzzle!(
     b"Homing Missiles",
     b"Red Alarm",
@@ -642,7 +664,7 @@ pub const HOMING_MISSILES: Puzzle = puzzle!(
     ------x-----x-------"
 );
 
-pub const PUZZLES: [Puzzle; 27] = [
+pub const PUZZLES: [Puzzle; 28] = [
     TETRIS_BLOCK,
     GOLF_BALL,
     HEART,
@@ -669,6 +691,7 @@ pub const PUZZLES: [Puzzle; 27] = [
     MARIO,
     PAGERO,
     WARIO,
+    MASK_GUY,
     HOMING_MISSILES,
 ];
 
