@@ -461,6 +461,28 @@ pub const JACK_SKELTON: Puzzle = puzzle!(
     -----xx-xx-----"
 );
 
+pub const CAT: Puzzle = puzzle!(
+    b"Cat",
+    b"Virtual Boy Wario Land",
+    (15, 15),
+    b"
+    ----xx---xx----
+    ---x--xxx--x---
+    ---x-x-x-x-x---
+    --x-xxx-xxx-x--
+    --x--xx-xx--xx-
+    --x----x----x-x
+    -xxx-xx-xx-xx-x
+    x--xx----xxx--x
+    x---xxxxxx----x
+    -xx--xxxx---xx-
+    --xx--xxx-----x
+    -x-xxxxxxx----x
+    -x--xx--xxxx--x
+    --x-xxx--xxx-x-
+    --xx-xxxxx-xxx-"
+);
+
 pub const REPAIR_DRONE: Puzzle = puzzle!(
     b"Repair Drone",
     b"Vertical Force",
@@ -691,7 +713,7 @@ pub const MEGU: Puzzle = puzzle!(
     -------xx--xx-------"
 );
 
-pub const PUZZLES: [Puzzle; 29] = [
+pub const PUZZLES: [Puzzle; 30] = [
     TETRIS_BLOCK,
     GOLF_BALL,
     HEART,
@@ -711,6 +733,7 @@ pub const PUZZLES: [Puzzle; 29] = [
     BOWLER,
     BOMBERMAN_BLOCK,
     JACK_SKELTON,
+    CAT,
     REPAIR_DRONE,
     YOSHI,
     P_TRON,
