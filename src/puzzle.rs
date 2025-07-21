@@ -664,7 +664,34 @@ pub const HOMING_MISSILES: Puzzle = puzzle!(
     ------x-----x-------"
 );
 
-pub const PUZZLES: [Puzzle; 28] = [
+pub const MEGU: Puzzle = puzzle!(
+    b"Megu-tan",
+    b"Virtual Lab",
+    (20, 20),
+    b"
+    ----x---xxxxxx------
+    ---x-xxx------xx----
+    ---x----xxxx----x---
+    ----x--x----xx--x---
+    ---x--x-x--x--x-x---
+    ---x--x-xx-xx-x-x---
+    ----xxx------x-x----
+    ----xx-x-x--x-xx----
+    ---xx-xxx--xxx-xx---
+    --xx-x---xx---x-xx--
+    -xx-xxx------xxx-xx-
+    -x--x-xx-xx-xx-x--x-
+    -x-x-x-xxxxxx-x-x-x-
+    -x-x-x-x-xx-x-x-x-x-
+    -x--x-x--xx--x-x--x-
+    -x----x-xxxx-x----x-
+    -x-x-x-xxxxxxx-x-x--
+    --x-x-xxx--xxxx-x---
+    ------xx----xx------
+    -------xx--xx-------"
+);
+
+pub const PUZZLES: [Puzzle; 29] = [
     TETRIS_BLOCK,
     GOLF_BALL,
     HEART,
@@ -693,6 +720,7 @@ pub const PUZZLES: [Puzzle; 28] = [
     WARIO,
     MASK_GUY,
     HOMING_MISSILES,
+    MEGU,
 ];
 
 pub const ICON_CHARS: [vip::Character; PUZZLES.len() * 25] =
