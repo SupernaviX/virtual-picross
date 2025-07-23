@@ -6,8 +6,8 @@ use vb_rt::sys::vip;
 use crate::{
     assets,
     game::GameResult,
-    puzzle::{ICONS, PUZZLES, Puzzle},
-    save,
+    puzzle::{Puzzle, ICONS, PUZZLES},
+    save::SaveData,
     state::GameState,
 };
 
@@ -16,7 +16,7 @@ const BG: u8 = 2;
 pub struct Menu {
     index: usize,
     cursor_delay: u8,
-    times: [Option<u32>; PUZZLES.len()],
+    saved: SaveData,
     index_renderer: TextRenderer,
     size_renderer: TextRenderer,
     name_renderer: BufferedTextRenderer<32>,
@@ -45,7 +45,7 @@ impl Menu {
         let mut me = Self {
             index: 0,
             cursor_delay: 0,
-            times: save::load_times(),
+            saved: SaveData::load(),
             index_renderer,
             size_renderer,
             name_renderer: name_renderer.buffered(2),
@@ -83,7 +83,7 @@ impl Menu {
                 (assets::MENU_ITEM, STEREO)
             };
 
-            if self.times[index].is_some() {
+            if self.saved.times[index].is_some() {
                 let world = vip::WORLDS.index(next_world);
                 next_world -= 1;
                 world.header().write(
@@ -254,9 +254,8 @@ impl Menu {
 
     pub fn finish_puzzle(&mut self, result: GameResult) {
         if let GameResult::Won(time) = result {
-            if self.times[self.index].is_none_or(|t| t > time) {
-                self.times[self.index] = Some(time);
-                save::save_time(self.index, time);
+            if self.saved.times[self.index].is_none_or(|t| t > time) {
+                self.saved.save_time(self.index, time);
             }
         }
     }
@@ -267,7 +266,7 @@ impl Menu {
 
     fn display_stats(&mut self) {
         let puzzle = &PUZZLES[self.index];
-        let (done, seconds) = match self.times[self.index] {
+        let (done, seconds) = match self.saved.times[self.index] {
             Some(time) => (true, time / 50),
             None => (false, 0),
         };
