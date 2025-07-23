@@ -1,4 +1,4 @@
-use vb_rt::{println, sys::vip};
+use vb_rt::sys::vip;
 
 use crate::{assets, state::GameState};
 
@@ -81,7 +81,6 @@ impl Title {
             return true;
         }
         self.timer = (self.timer + 1) % 64;
-        println!("{} {}", self.timer, self.timer / 8);
         false
     }
 }

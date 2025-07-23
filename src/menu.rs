@@ -118,6 +118,7 @@ impl Menu {
                     .with_bg_map_base(BG),
             );
             world.gx().write(8);
+            world.gp().write(0);
             world.gy().write(184);
             world.mx().write(0);
             world.my().write(0);
@@ -136,6 +137,7 @@ impl Menu {
                     .with_bg_map_base(BG),
             );
             world.gx().write(8);
+            world.gp().write(0);
             world.gy().write(184 + text_height);
             world.mx().write(0);
             world.my().write(24);
@@ -153,6 +155,7 @@ impl Menu {
                     .with_bg_map_base(BG),
             );
             world.gx().write(104);
+            world.gp().write(0);
             world.gy().write(184);
             world.mx().write(0);
             world.my().write(48);
@@ -171,6 +174,7 @@ impl Menu {
                     .with_bg_map_base(BG),
             );
             world.gx().write(104);
+            world.gp().write(0);
             world.gy().write(184 + text_height);
             world.mx().write(0);
             world.my().write(72);
@@ -189,6 +193,7 @@ impl Menu {
                     .with_bg_map_base(BG),
             );
             world.gx().write(20);
+            world.gp().write(0);
             world.gy().write(68);
             world.mx().write(256);
             world.my().write(0);
@@ -207,6 +212,7 @@ impl Menu {
                     .with_bg_map_base(BG),
             );
             world.gx().write(348);
+            world.gp().write(0);
             world.gy().write(68);
             world.mx().write(256);
             world.my().write(48);
